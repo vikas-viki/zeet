@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import Modal from "./Modal";
+import Context, { State } from "../context/Context";
 
 function Navbar() {
     const [modalOpen, setModalOpen] = useState(false);
+
+    const { test } = useContext(Context) as State;
 
     const toggleModel = () => {
         setModalOpen(prev => !prev);
