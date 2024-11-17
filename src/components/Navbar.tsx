@@ -4,8 +4,8 @@ import Context, { State } from "../context/Context";
 
 function Navbar() {
     const [modalOpen, setModalOpen] = useState(false);
-
-    const { test } = useContext(Context) as State;
+    const [spaceName, setSpaceName] = useState("");
+    const { createSpace } = useContext(Context) as State;
 
     const toggleModel = () => {
         setModalOpen(prev => !prev);
@@ -20,7 +20,7 @@ function Navbar() {
                         title="Create new space"
                         actionText="Create"
                         onClose={toggleModel}
-                        onAction={toggleModel}
+                        onAction={() => createSpace(spaceName)}
                     >
                         <div className="space_modal_content">
                             <input
@@ -29,6 +29,8 @@ function Navbar() {
                                 spellCheck="false"
                                 className="space_name"
                                 placeholder="Enter sapce name"
+                                value={spaceName}
+                                onChange={(e) => setSpaceName(e.target.value)}
                             />
                         </div>
                     </Modal>

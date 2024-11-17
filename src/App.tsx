@@ -1,5 +1,4 @@
 import {
-  BrowserRouter,
   Route,
   Routes,
 } from "react-router-dom";
@@ -11,12 +10,10 @@ function App() {
 
   return (
     <div className='main'>
-      <BrowserRouter >
-        <Routes>
-          <Route path="/" element={<Hero />} />
-          <Route path="/spaces" element={<Spaces />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Hero />} />
+        <Route path="/spaces" element={<Spaces />} />
+      </Routes>
     </div>
   )
 }
