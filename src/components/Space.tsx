@@ -1,10 +1,11 @@
-import { Application, Assets } from 'pixi.js';
+import { Application, Assets, Texture } from 'pixi.js';
 import { CompositeTilemap } from "@pixi/tilemap";
 import { useEffect, useRef } from 'react';
 import { Map } from '../types/mapTypes';
 
 const Space = () => {
     const canvasRef = useRef<HTMLDivElement>(null);
+
 
     async function loadMap() {
         Assets.addBundle('tilemap', {
@@ -15,30 +16,37 @@ const Space = () => {
         });
 
         const resources = await Assets.loadBundle('tilemap');
-        const mapData: Map = resources.map;
+        const mapData: Map = resources.map; 
         const tilemap = new CompositeTilemap();
 
         mapData.layers.forEach((layer) => {
-            if (layer.type == "tilelayer") {
+            if (layer.type === "tilelayer") {
                 const tileSize = mapData.tilewidth;
-                layer.data.forEach((tileId, index) => {
-                    if (tileId == 0) return;
 
-                    const tileset = mapData.tilesets.find(tileset => (
-                        tileId >= tileset.firstgid
+                layer.data.forEach((tileId, index) => {
+                    if (tileId === 0) return; 
+
+                    const tileset = mapData.tilesets.find((tileset) => (
+                        tileId >= tileset.firstgid &&
+                        tileId < tileset.firstgid + (tileset.imagewidth / tileSize) * (tileset.imageheight / tileSize)
                     ));
 
                     if (tileset) {
-                        const texturename = tileset.name.toLowerCase();
+                        const textureName = tileset.name.toLowerCase();
                         const tileX = (index % layer.width) * tileSize;
-                        const tileY = Math.floor(index / layer.width) * tileSize; // Fixed tileY calculation
+                        const tileY = Math.floor(index / layer.width) * tileSize;
                         const localTileId = tileId - tileset.firstgid;
 
                         const columns = tileset.imagewidth / tileSize;
                         const textureX = (localTileId % columns) * tileSize;
                         const textureY = Math.floor(localTileId / columns) * tileSize;
 
-                        const texture = resources[texturename];
+                        const texture: Texture = resources[textureName];
+                        if (!texture) {
+                            console.error(`Texture ${textureName} not found!`);
+                            return;
+                        }
+
                         tilemap.tile(texture, tileX, tileY, {
                             u: textureX,
                             v: textureY,
@@ -49,6 +57,7 @@ const Space = () => {
                 });
             }
         });
+
         return tilemap;
     }
 
