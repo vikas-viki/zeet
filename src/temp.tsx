@@ -1,12 +1,12 @@
 import { CompositeTilemap } from "@pixi/tilemap";
 import { AnimatedSprite, Application, Assets, Rectangle, Texture } from "pixi.js";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Map } from "../types/mapTypes";
+import { Map } from "./types/mapTypes";
 
 const GAME_CONFIG = {
     width: 1200,
     height: 850,
-    playerSpeed: 1,
+    playerSpeed: 2,
     tileSize: 32,
     spriteSheetWidth: 32,
     spriteSheetHeight: 40
@@ -34,7 +34,7 @@ const Space: React.FC = () => {
         keysRef.current[e.key] = false;
     }, []);
 
-    const createPlayerSheet = useCallback(() => {
+    const createPlayerSheet = useMemo(() => {
         const player = Assets.get("player");
         const { spriteSheetHeight: h, spriteSheetWidth: w } = GAME_CONFIG;
 
@@ -82,12 +82,26 @@ const Space: React.FC = () => {
             player.y += dy;
         }
 
-        const playerSpriteSheet = createPlayerSheet();
+        const playerSpriteSheet = createPlayerSheet;
 
-        if (keys["w"] || keys["ArrowUp"]) movePlayer(playerSpriteSheet.walkUp, 0, -GAME_CONFIG.playerSpeed);
+        if (keys["w"] || keys["ArrowUp"]) movePlayer(playerSpriteSheet.walkUp, 0, GAME_CONFIG.playerSpeed);
         if (keys["s"] || keys["ArrowDown"]) movePlayer(playerSpriteSheet.walkDown, 0, GAME_CONFIG.playerSpeed);
         if (keys["a"] || keys["ArrowLeft"]) movePlayer(playerSpriteSheet.walkLeft, -GAME_CONFIG.playerSpeed, 0);
         if (keys["d"] || keys["ArrowRight"]) movePlayer(playerSpriteSheet.walkRight, GAME_CONFIG.playerSpeed, 0);
+    }, []);
+
+    const createPlayer = useCallback(() => {
+        const player = new AnimatedSprite(createPlayerSheet.down);
+
+        player.anchor.set(0.5);
+        player.animationSpeed = 0.1;
+        player.loop = false;
+        player.x = (appRef.current?.screen.width || GAME_CONFIG.width) / 2;
+        player.y = (appRef.current?.screen.height || GAME_CONFIG.height) / 2;
+        playerRef.current = player;
+
+        appRef.current?.stage.addChild(player);
+        appRef.current?.ticker.add(gameLoop);
     }, []);
 
     useEffect(() => {
@@ -106,25 +120,12 @@ const Space: React.FC = () => {
             appRef.current = app;
 
             Assets.addBundle('tilemap', assetBundle.tilemap);
-            const resources = await Assets.loadBundle('tilemap');
-            console.log(resources);
+            const resources = await Assets.load('tilemap');
+
             const tilemap = renderTilemap(resources);
             app.stage.addChild(tilemap);
 
-            Assets.add({ alias: "player", src: "/src/map_assets/player.png" });
-            await Assets.load("player");
-
-            const player = new AnimatedSprite(createPlayerSheet().down);
-
-            player.anchor.set(0.5);
-            player.animationSpeed = 0.1;
-            player.loop = false;
-            player.x = app.screen.width / 2;
-            player.y = app.screen.height / 2;
-            playerRef.current = player;
-
-            app.stage.addChild(player);
-            app.ticker.add(gameLoop);
+            createPlayer();
         }
         setUpGame();
 
