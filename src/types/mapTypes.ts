@@ -1,3 +1,5 @@
+import { Texture } from "pixi.js";
+
 export type Layer = {
     data: number[];
     height: number,
@@ -42,3 +44,14 @@ export type Map = {
     version: string,
     width: string
 }
+
+export type PlayerSprites = {
+    down: Texture[],
+    up: Texture[],
+    left: Texture[],
+    right: Texture[],
+    walkDown: Texture[],
+    walkUp: Texture[],
+    walkLeft: Texture[],
+    walkRight: Texture[]
+};
