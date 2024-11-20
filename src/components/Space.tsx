@@ -1,7 +1,7 @@
 import { CompositeTilemap } from "@pixi/tilemap";
 import { AnimatedSprite, Application, Assets, Rectangle, Texture } from "pixi.js";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Map } from "../types/mapTypes";
+import { Map, PlayerSprites } from "../types/mapTypes";
 
 const GAME_CONFIG = {
     width: 1200,
@@ -17,6 +17,7 @@ const Space: React.FC = () => {
     const appRef = useRef<Application | null>(null);
     const playerRef = useRef<AnimatedSprite | null>(null);
     const keysRef = useRef<Record<string, boolean>>({});
+    var playerSpriteSheet = {} as PlayerSprites;
 
     const assetBundle = useMemo(() => ({
         tilemap: {
@@ -34,7 +35,7 @@ const Space: React.FC = () => {
         keysRef.current[e.key] = false;
     }, []);
 
-    const createPlayerSheet = useCallback(() => {
+    const createPlayerSheet = () => {
         const player = Assets.get("player");
         const { spriteSheetHeight: h, spriteSheetWidth: w } = GAME_CONFIG;
 
@@ -64,7 +65,7 @@ const Space: React.FC = () => {
                 new Texture({ source: player.source, frame: new Rectangle(9 * w, 0, w, h) })
             ]
         }
-    }, []);
+    }
 
     const gameLoop = useCallback(() => {
         const player = playerRef.current;
@@ -81,8 +82,6 @@ const Space: React.FC = () => {
             player.x += dx;
             player.y += dy;
         }
-
-        const playerSpriteSheet = createPlayerSheet();
 
         if (keys["w"] || keys["ArrowUp"]) movePlayer(playerSpriteSheet.walkUp, 0, -GAME_CONFIG.playerSpeed);
         if (keys["s"] || keys["ArrowDown"]) movePlayer(playerSpriteSheet.walkDown, 0, GAME_CONFIG.playerSpeed);
@@ -114,7 +113,9 @@ const Space: React.FC = () => {
             Assets.add({ alias: "player", src: "/src/map_assets/player.png" });
             await Assets.load("player");
 
-            const player = new AnimatedSprite(createPlayerSheet().down);
+            playerSpriteSheet = createPlayerSheet();
+
+            const player = new AnimatedSprite(playerSpriteSheet.down);
 
             player.anchor.set(0.5);
             player.animationSpeed = 0.1;
@@ -127,7 +128,6 @@ const Space: React.FC = () => {
             app.ticker.add(gameLoop);
         }
         setUpGame();
-
         window.addEventListener("keydown", keysDown);
         window.addEventListener("keyup", keysUp);
     }, []);
