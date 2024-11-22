@@ -75,7 +75,7 @@ const Space: React.FC = () => {
         if (!player || !app) return;
 
         const movePlayer = (textures: Texture[], dx: number, dy: number) => {
-            if (!player.playing) {
+            if (player.textures !== textures || !player.playing) {
                 player.textures = textures;
                 player.play();
             }
