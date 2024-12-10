@@ -1,183 +1,172 @@
-import { CompositeTilemap } from "@pixi/tilemap";
-import { AnimatedSprite, Application, Assets, Rectangle, Texture } from "pixi.js";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { Map, PlayerSprites } from "../types/mapTypes";
+import Phaser from "phaser";
+import { useEffect, useRef } from "react";
+import sky from "../map_assets/phs/sky.png";
+import platform from '../map_assets/phs/platform.png';
+import star from '../map_assets/phs/star.png';
+import bomb from '../map_assets/phs/bomb.png';
+import dude from '../map_assets/phs/dude.png';
 
-const GAME_CONFIG = {
-    width: 1200,
-    height: 850,
-    playerSpeed: 1,
-    tileSize: 32,
-    spriteSheetWidth: 32,
-    spriteSheetHeight: 40
-};
+const Space = () => {
+    const gameRef = useRef<Phaser.Game | null>(null);
+    var platforms: Phaser.Physics.Arcade.StaticGroup,
+        player: Phaser.Physics.Arcade.Sprite,
+        cursors: Phaser.Types.Input.Keyboard.CursorKeys,
+        stars: Phaser.Physics.Arcade.Group;
+    var score = 0;
+    var scoreText: Phaser.GameObjects.Text, bombs: Phaser.Physics.Arcade.Group;
 
-const Space: React.FC = () => {
-    const canvasRef = useRef<HTMLDivElement>(null);
-    const appRef = useRef<Application | null>(null);
-    const playerRef = useRef<AnimatedSprite | null>(null);
-    const keysRef = useRef<Record<string, boolean>>({});
-    var playerSpriteSheet = {} as PlayerSprites;
-
-    const assetBundle = useMemo(() => ({
-        tilemap: {
-            map: '/src/map_assets/map.json',
-            garden: '/src/map_assets/garden.png',
-            pottedplants: '/src/map_assets/pottedplants.png',
-            office_pallete: '/src/map_assets/office_pallete.png'
-        }
-    }), []);
-
-    const keysDown = useCallback((e: KeyboardEvent) => {
-        keysRef.current[e.key] = true;
-    }, []);
-    const keysUp = useCallback((e: KeyboardEvent) => {
-        keysRef.current[e.key] = false;
-    }, []);
-
-    const createPlayerSheet = () => {
-        const player = Assets.get("player");
-        const { spriteSheetHeight: h, spriteSheetWidth: w } = GAME_CONFIG;
-
-        return {
-            down: [new Texture({ source: player.source, frame: new Rectangle(1, 0, w, h) })],
-            up: [new Texture({ source: player.source, frame: new Rectangle(6 * w, 0, w, h) })],
-            left: [new Texture({ source: player.source, frame: new Rectangle(3 * w, 0, w, h) })],
-            right: [new Texture({ source: player.source, frame: new Rectangle(9 * w, 0, w, h) })],
-            walkUp: [
-                new Texture({ source: player.source, frame: new Rectangle(7 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(8 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(6 * w, 0, w, h) })
-            ],
-            walkDown: [
-                new Texture({ source: player.source, frame: new Rectangle(1 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(2 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(1, 0, w, h) })
-            ],
-            walkLeft: [
-                new Texture({ source: player.source, frame: new Rectangle(4 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(5 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(3 * w, 0, w, h) })
-            ],
-            walkRight: [
-                new Texture({ source: player.source, frame: new Rectangle(10 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(11 * w, 0, w, h) }),
-                new Texture({ source: player.source, frame: new Rectangle(9 * w, 0, w, h) })
-            ]
-        }
-    }
-
-    const gameLoop = useCallback(() => {
-        const player = playerRef.current;
-        const keys = keysRef.current;
-        const app = appRef.current;
-
-        if (!player || !app) return;
-
-        const movePlayer = (textures: Texture[], dx: number, dy: number) => {
-            if (player.textures !== textures || !player.playing) {
-                player.textures = textures;
-                player.play();
-            }
-            player.x += dx;
-            player.y += dy;
-        }
-
-        if (keys["w"] || keys["ArrowUp"]) movePlayer(playerSpriteSheet.walkUp, 0, -GAME_CONFIG.playerSpeed);
-        if (keys["s"] || keys["ArrowDown"]) movePlayer(playerSpriteSheet.walkDown, 0, GAME_CONFIG.playerSpeed);
-        if (keys["a"] || keys["ArrowLeft"]) movePlayer(playerSpriteSheet.walkLeft, -GAME_CONFIG.playerSpeed, 0);
-        if (keys["d"] || keys["ArrowRight"]) movePlayer(playerSpriteSheet.walkRight, GAME_CONFIG.playerSpeed, 0);
-    }, []);
 
     useEffect(() => {
-        const setUpGame = async () => {
-            const app = new Application();
-            await app.init({
-                width: GAME_CONFIG.width,
-                height: GAME_CONFIG.height,
-                backgroundColor: 0x1099bb
-            });
+        if (!gameRef.current) {
 
-            if (canvasRef.current && !canvasRef.current.hasChildNodes()) {
-                canvasRef.current.appendChild(app.canvas);
+
+            var config: Phaser.Types.Core.GameConfig = {
+                type: Phaser.AUTO,
+                width: 800,
+                height: 600,
+                scene: {
+                    preload,
+                    create,
+                    update
+                },
+                physics: {
+                    default: 'arcade',
+                    arcade: {
+                        gravity: {
+                            y: 300,
+                            x: 0
+                        },
+                        debug: false
+                    }
+                }
+            };
+            gameRef.current = new Phaser.Game(config);
+
+            function preload() {
+                this.load.image("sky", sky);
+                this.load.image('ground', platform);
+                this.load.image('star', star);
+                this.load.image('bomb', bomb);
+                this.load.spritesheet('dude',
+                    dude,
+                    { frameWidth: 32, frameHeight: 48 }
+                );
             }
 
-            appRef.current = app;
+            function create() {
+                this.add.image(400, 300, "sky"); // center
 
-            Assets.addBundle('tilemap', assetBundle.tilemap);
-            const resources = await Assets.loadBundle('tilemap');
-            console.log(resources);
-            const tilemap = renderTilemap(resources);
-            app.stage.addChild(tilemap);
+                platforms = this.physics.add.staticGroup();
+                // width center, hight center.
+                platforms.create(400, 568, 'ground').setScale(2).refreshBody(); // nofity changes on scaling 'refreshbody'
+                platforms.create(600, 400, 'ground');
+                platforms.create(50, 250, 'ground');
+                platforms.create(750, 220, 'ground');
 
-            Assets.add({ alias: "player", src: "/src/map_assets/player.png" });
-            await Assets.load("player");
+                player = this.physics.add.sprite(100, 450, 'dude');
 
-            playerSpriteSheet = createPlayerSheet();
+                this.physics.add.collider(player, platforms);
 
-            const player = new AnimatedSprite(playerSpriteSheet.down);
+                player.setBounce(0.2);
+                player.setCollideWorldBounds(true);
 
-            player.anchor.set(0.5);
-            player.animationSpeed = 0.1;
-            player.loop = false;
-            player.x = app.screen.width / 2;
-            player.y = app.screen.height / 2;
-            playerRef.current = player;
+                this.anims.create({
+                    key: 'left',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 0, end: 3 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
 
-            app.stage.addChild(player);
-            app.ticker.add(gameLoop);
-        }
-        setUpGame();
-        window.addEventListener("keydown", keysDown);
-        window.addEventListener("keyup", keysUp);
-    }, []);
+                this.anims.create({
+                    key: 'turn',
+                    frames: [{ key: 'dude', frame: 4 }],
+                    frameRate: 20
+                });
 
-    return <div ref={canvasRef} />
-}
+                this.anims.create({
+                    key: 'right',
+                    frames: this.anims.generateFrameNumbers('dude', { start: 5, end: 8 }),
+                    frameRate: 10,
+                    repeat: -1
+                });
 
-export default Space;
+                cursors = this.input.keyboard.createCursorKeys();
 
-function renderTilemap(resources: any) {
-    const mapData: Map = resources.map;
-    const tilemap = new CompositeTilemap();
+                stars = this.physics.add.group({
+                    key: 'star',
+                    repeat: 11,
+                    setXY: { x: 12, y: 0, stepX: 70 }
+                });
+                this.physics.add.collider(stars, platforms);
+                this.physics.add.overlap(player, stars, collectStar, null, this);
+                stars.children.iterate((child: any) => child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8)));
+                scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+                bombs = this.physics.add.group();
 
-    mapData.layers.forEach((layer) => {
-        if (layer.type === "tilelayer") {
-            const tileSize = mapData.tilewidth;
+                this.physics.add.collider(bombs, platforms);
 
-            layer.data.forEach((tileId, index) => {
-                if (tileId === 0) return;
+                this.physics.add.collider(player, bombs, hitBomb, null, this);
 
-                const tileset = mapData.tilesets.find((tileset) => (
-                    tileId >= tileset.firstgid &&
-                    tileId < tileset.firstgid + tileset.tilecount
-                ));
+            }
 
-                if (tileset) {
-                    const textureName = tileset.name.toLowerCase();
-                    const tileX = (index % layer.width) * tileSize;
-                    const tileY = Math.floor(index / layer.width) * tileSize;
-                    const localTileId = tileId - tileset.firstgid;
+            function collectStar(player: any, star: any) {
+                star.disableBody(true, true);
 
-                    const columns = tileset.imagewidth / tileSize;
-                    const textureX = (localTileId % columns) * tileSize;
-                    const textureY = Math.floor(localTileId / columns) * tileSize;
+                score += 10;
+                scoreText.setText('Score: ' + score);
 
-                    const texture: Texture = resources[textureName];
-                    if (!texture) {
-                        console.error(`Texture ${textureName} not found!`);
-                        return;
-                    }
-
-                    tilemap.tile(texture, tileX, tileY, {
-                        u: textureX,
-                        v: textureY,
-                        tileWidth: tileSize,
-                        tileHeight: tileSize
+                if (stars.countActive(true) === 0) {
+                    stars.children.iterate(function (child: any) {
+                        return child.enableBody(true, child.x, 0, true, true);
                     });
+
+                    var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+                    var bomb = bombs.create(x, 16, 'bomb');
+                    bomb.setBounce(1);
+                    bomb.setCollideWorldBounds(true);
+                    bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
                 }
-            });
+            }
+
+
+            function hitBomb(player: any, bomb: any) {
+                this.physics.pause();
+
+                player.setTint(0xff0000);
+
+                player.anims.play('turn');
+
+                var gameOver = true;
+            }
+
+
+            function update() {
+                if (cursors.left.isDown) {
+                    player.setVelocityX(-160);
+
+                    player.anims.play('left', true);
+                }
+                else if (cursors.right.isDown) {
+                    player.setVelocityX(160);
+
+                    player.anims.play('right', true);
+                }
+                else {
+                    player.setVelocityX(0);
+
+                    player.anims.play('turn');
+                }
+
+                if (cursors.up.isDown && player.body?.touching.down) {
+                    player.setVelocityY(-330);
+                }
+
+            }
         }
-    });
-    return tilemap;
+    }, [])
+    return (
+        <h1>Hello again</h1>
+    )
 }
+export default Space;
