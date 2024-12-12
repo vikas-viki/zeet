@@ -83,9 +83,9 @@ const Space = () => {
                 player.current = this.physics.add.sprite(400, 400, "player", 0);
 
                 layers![0].setDepth(0);
-                player.current.setDepth(1);
                 layers![1].setDepth(1);
-                layers![2].setDepth(2);
+                player.current.setDepth(2);
+                layers![2].setDepth(3);
 
                 tableColliders.forEach(collider => {
                     this.physics.add.collider(player.current!, collider);
@@ -118,18 +118,21 @@ const Space = () => {
                     frameRate: 10,
                     repeat: -1
                 });
+                layers![1].setCollisionByExclusion([-1]);
                 cursors = this.input.keyboard?.createCursorKeys();
-                if (layers![1])
+
+                if (layers)
                     this.physics.add.overlap(player.current, layers![1], () => {
-                        const tile = map.getTileAtWorldXY(
+                        const tile = layers![1].getTileAtWorldXY(
                             player.current!.x,
-                            player.current!.y
+                            player.current!.y,
+                            true
                         );
                         if (tile && (tile.index === 1006 || tile.index === 956)) {
-                            player.current?.setDepth(5);
-                            console.log("Specific tile collision detected!");
+                            console.log("Overlap with specific tile detected!");
                         }
                     });
+
             }
 
             function update(this: Phaser.Scene) {
