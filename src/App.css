@@ -161,7 +161,7 @@ body {
   display: flex;
   justify-content: space-around;
   width: 100%;
-  margin:  25px 0px;
+  margin: 25px 0px;
   margin-bottom: 10px;
 }
 
@@ -172,11 +172,11 @@ body {
   width: 30%;
   border-radius: 30px;
   font-family: "Poppins";
-  padding: 10px;
-  height: 50px;
-  font-size: 16px;
   font-weight: 500;
   letter-spacing: 0.8px;
+  font-size: 16px;
+  padding: 10px;
+  height: 50px;
   transition: 0.3s all;
 }
 
@@ -193,4 +193,189 @@ body {
 .modal_controller button:hover {
   transform: scale(1.05);
   box-shadow: 2px 3px 5px rgba(128, 128, 128, 0.746);
+}
+
+/* Login */
+.auth_container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.auth_card {
+  background-color: white;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 28rem;
+  padding: 2rem;
+}
+
+.auth_header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth_header h1 {
+  font-size: 1.875rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.auth_header p {
+  color: #6b7280;
+}
+
+.auth_tabs {
+  display: flex;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.tab {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+  color: #6b7280;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 16.5px;
+  font-family: "Poppins";
+  height: max-content;
+}
+
+.tab:hover {
+  color: #4b5563;
+}
+
+.tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.auth_form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.input_group {
+  position: relative;
+}
+
+.input_group .icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.15rem;
+  height: 1.15rem;
+  color: #9ca3af;
+}
+
+.input_group input {
+  width: 87%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input_group input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+.submit_button {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  font-size: 16.5px;
+  font-family: "Poppins";
+  height: max-content;
+}
+
+.submit_button:hover {
+  background-color: #1d4ed8;
+}
+
+.submit_button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+}
+
+form input {
+  border: 0.5px solid rgba(175, 174, 174, 0.583);
+  border-radius: 10px;
+  outline: none;
+  padding: 10px;
+  font-size: 15.5px;
+  width: 90%;
+  font-family: "Poppins";
+  height: max-content;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1rem 0;
+  color: #6b7280;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.divider span {
+  padding: 0 1rem;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.remember_me {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.remember_me input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border: 1px solid #d1d5db;
+  cursor: pointer;
+}
+
+.remember_me label {
+  color: #4b5563;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.google_login{
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

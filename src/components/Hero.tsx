@@ -8,7 +8,7 @@ function Hero() {
             <div className="hero_text">
                 <span>Zeet, <br />Connecting Like<br />Never Before.</span>
                 <button className="button"
-                    onClick={() => { navigate("/spaces") }}
+                    onClick={() => { navigate("/login") }}
                 >Take me in</button>
             </div>
             <div className="hero_image">

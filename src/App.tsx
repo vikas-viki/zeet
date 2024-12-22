@@ -6,6 +6,7 @@ import './App.css';
 import Hero from './components/Hero';
 import Spaces from "./components/Spaces";
 import Space from "./components/Space";
+import Login from "./components/Login";
 
 function App() {
 
@@ -15,6 +16,7 @@ function App() {
         <Route path="/" element={<Hero />} />
         <Route path="/spaces" element={<Spaces />} />
         <Route path="/space/123" element={<Space />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </div>
   )
