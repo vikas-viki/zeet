@@ -136,6 +136,9 @@ function App() {
                         <GoogleOAuthProvider clientId={CLIENT_ID}>
                             <GoogleLogin
                                 width="450"
+                                theme='filled_black'
+                                size='large'
+                                shape='pill'
                                 auto_select={true}
                                 onSuccess={credentialResponse => {
                                     const credentials = jwtDecode(credentialResponse.credential!);
