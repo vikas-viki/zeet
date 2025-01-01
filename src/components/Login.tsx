@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User } from 'lucide-react';
-import { GoogleOAuthProvider } from '@react-oauth/google';
+import { CredentialResponse, GoogleOAuthProvider } from '@react-oauth/google';
 import { GoogleLogin } from '@react-oauth/google';
 import { jwtDecode } from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { FormData, GoogleCredential } from '../types/StateTypes';
+import { useMyContext } from '../context/Context';
+import toast from 'react-hot-toast';
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-
-type FormData = {
-    email: string;
-    password: string;
-    username: string;
-    confirmPassword: string;
-    rememberMe: boolean;
-};
+const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function App() {
+    const { getUniqueId, getHash } = useMyContext();
     const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
     const [formData, setFormData] = useState<FormData>({
         email: '',
@@ -24,6 +23,8 @@ function App() {
         rememberMe: false,
     });
 
+    const navigator = useNavigate();
+
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
         setFormData(prev => ({
@@ -32,11 +33,82 @@ function App() {
         }));
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const authorize = async (_formData: any, signup: boolean, google: boolean) => {
+        try {
+            if (signup) {
+                const response = await axios.post(`${SERVER_URL}/signup`, {
+                    email: _formData.email,
+                    username: _formData.username,
+                    password: google ? _formData.password : getHash(_formData.password),
+                    id: google ? _formData.id : getUniqueId(_formData.username, _formData.email, _formData.password)
+                });
+
+                if (response.status == 200) {
+                    toast.success("Signup successful.");
+                }
+
+                console.log({ signup: response });
+            } else {
+                const response = await axios.post(`${SERVER_URL}/login`, {
+                    email: _formData.email,
+                    password: google ? _formData.password : getHash(_formData.password)
+                });
+
+                if (response.status == 200) {
+                    toast.success("Login successful.");
+                }
+
+                console.log({ login: response });
+            }
+        } catch (e: any) {
+            if (e?.response.data.message === "DUPLICATE_USERNAME") {
+                toast.error("Choose different Username!");
+            } else if (e?.response.data.message === "DUPLICATE_EMAIL") {
+                toast.error("User exists, login instead!");
+            } else if (e?.response.data.message === "NO_USER_FOUND") {
+                toast.error("User not found! Signup instead.");
+            } else {
+                toast.error("Error occurred!");
+            }
+        }
+    }
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log('Form submitted:', formData);
+
+        const signup = activeTab === 'signup';
+
+        if (formData.password !== formData.confirmPassword && signup) {
+            toast.error("Confirm password didn't match!");
+            return;
+        }
+
+        await authorize(formData, signup, false);
     };
 
+    const googleSubmit = async (credentialResponse: CredentialResponse) => {
+        const credentials: GoogleCredential = jwtDecode(credentialResponse.credential!);
+        console.log(credentials);
+
+        const signup = activeTab === 'signup';
+        var _formData;
+
+        if (signup) {
+            _formData = {
+                email: credentials.email,
+                username: credentials.name,
+                id: credentials.sub,
+                password: `${credentials.sub}${getHash('__GOOGLE')}`
+            }
+        } else {
+            _formData = {
+                email: credentials.email,
+                password: `${credentials.sub}${getHash('__GOOGLE')}`
+            }
+        }
+        await authorize(_formData, signup, true);
+    }
 
     return (
         <div className="auth_container">
@@ -95,6 +167,7 @@ function App() {
                             name="password"
                             placeholder="Password"
                             value={formData.password}
+                            minLength={8}
                             onChange={handleInputChange}
                             required
                         />
@@ -106,6 +179,7 @@ function App() {
                             <input
                                 type="password"
                                 name="confirmPassword"
+                                minLength={8}
                                 placeholder="Confirm password"
                                 value={formData.confirmPassword}
                                 onChange={handleInputChange}
@@ -140,13 +214,9 @@ function App() {
                                 size='large'
                                 shape='pill'
                                 auto_select={true}
-                                onSuccess={credentialResponse => {
-                                    const credentials = jwtDecode(credentialResponse.credential!);
-                                    console.log(credentials);
-                                    console.log("sigin successful: ", credentialResponse);
-                                }}
+                                onSuccess={googleSubmit}
                                 onError={() => {
-                                    console.log('Login Failed');
+                                    toast.error('Login failed!');
                                 }}
                             />
                         </GoogleOAuthProvider>

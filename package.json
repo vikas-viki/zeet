@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
+    "axios": "^1.7.9",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.4.7",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.469.0",
@@ -18,10 +20,12 @@
     "phaser": "^3.87.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.5.1",
     "react-router-dom": "^6.28.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
