@@ -13,7 +13,7 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function App() {
-    const { getUniqueId, getHash } = useMyContext();
+    const { getUniqueId, getHash, setUserId } = useMyContext();
     const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
     const [formData, setFormData] = useState<FormData>({
         email: '',
@@ -45,6 +45,7 @@ function App() {
                 }, { withCredentials: true });
 
                 if (response.status == 200) {
+                    setUserId(response.data.userId);
                     toast.success("Signup successful.");
                     navigate("/spaces");
                 }
@@ -59,6 +60,7 @@ function App() {
 
                 if (response.status == 200) {
                     toast.success("Login successful.");
+                    setUserId(response.data.userId);
                     navigate("/spaces")
                 }
 
@@ -116,6 +118,7 @@ function App() {
         try {
             axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
                 if(res.data.message === "YES"){
+                    setUserId(res.data.userId);
                     navigate("/spaces");
                 }
             }).catch(console.log)

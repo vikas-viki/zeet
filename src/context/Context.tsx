@@ -5,6 +5,8 @@ export interface State {
     createSpace: (name: string) => void;
     getUniqueId: (username: string, email: string, password: string) => string;
     getHash: (data: string) => string;
+    userId: string;
+    setUserId: (userId: string) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

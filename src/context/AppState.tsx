@@ -12,6 +12,7 @@ const SALT = import.meta.env.VITE_SALT;
 
 const AppState: React.FC<StateProps> = ({ children }) => {
     const navigate = useNavigate();
+    const [userId, setUserId] = React.useState<string>(''); 
 
     const createSpace = (name: string) => {
         navigate(`/space/${123}`);
@@ -32,7 +33,9 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             test,
             createSpace,
             getUniqueId,
-            getHash
+            getHash,
+            userId,
+            setUserId
         }
         }>
             {children}
