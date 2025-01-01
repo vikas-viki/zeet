@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mail, Lock, User } from 'lucide-react';
 import { CredentialResponse, GoogleOAuthProvider } from '@react-oauth/google';
 import { GoogleLogin } from '@react-oauth/google';
@@ -23,7 +23,7 @@ function App() {
         rememberMe: false,
     });
 
-    const navigator = useNavigate();
+    const navigate = useNavigate();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value, type, checked } = e.target;
@@ -40,22 +40,26 @@ function App() {
                     email: _formData.email,
                     username: _formData.username,
                     password: google ? _formData.password : getHash(_formData.password),
-                    id: google ? _formData.id : getUniqueId(_formData.username, _formData.email, _formData.password)
-                });
+                    id: google ? _formData.id : getUniqueId(_formData.username, _formData.email, _formData.password),
+                    rememberMe: _formData.rememberMe
+                }, { withCredentials: true });
 
                 if (response.status == 200) {
                     toast.success("Signup successful.");
+                    navigate("/spaces");
                 }
 
                 console.log({ signup: response });
             } else {
                 const response = await axios.post(`${SERVER_URL}/login`, {
                     email: _formData.email,
-                    password: google ? _formData.password : getHash(_formData.password)
-                });
+                    password: google ? _formData.password : getHash(_formData.password),
+                    rememberMe: _formData.rememberMe
+                }, { withCredentials: true });
 
                 if (response.status == 200) {
                     toast.success("Login successful.");
+                    navigate("/spaces")
                 }
 
                 console.log({ login: response });
@@ -94,21 +98,31 @@ function App() {
         const signup = activeTab === 'signup';
         var _formData;
 
+        _formData = {
+            email: credentials.email,
+            password: `${credentials.sub}${getHash('__GOOGLE')}`,
+            rememberMe: formData.rememberMe,
+            id: '',
+            username: ''
+        }
         if (signup) {
-            _formData = {
-                email: credentials.email,
-                username: credentials.name,
-                id: credentials.sub,
-                password: `${credentials.sub}${getHash('__GOOGLE')}`
-            }
-        } else {
-            _formData = {
-                email: credentials.email,
-                password: `${credentials.sub}${getHash('__GOOGLE')}`
-            }
+            _formData.id = credentials.sub;
+            _formData.username = credentials.name;
         }
         await authorize(_formData, signup, true);
     }
+
+    useEffect(() => {
+        try {
+            axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
+                if(res.data.message === "YES"){
+                    navigate("/spaces");
+                }
+            }).catch(console.log)
+        } catch (e) {
+            console.log(e);
+        }
+    }, []);
 
     return (
         <div className="auth_container">
