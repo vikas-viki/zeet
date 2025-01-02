@@ -7,10 +7,10 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
         <div className="space_card">
             <div
                 className="space_card_image"
-                style={{ backgroundImage: `url(${space.image})` }}
+                style={{ backgroundImage: `url(${space.spaceimage})` }}
             ></div>
             <div className="space_card_title">
-                <span>{space.name}</span>
+                <span>{space.spacename}</span>
                 <EllipsisVertical stroke="#000" className="ellipsis icon" />
                 <div className="space_card_options">
                     <button>

@@ -1,4 +1,5 @@
 import { createContext, useContext } from "react";
+import { UserSpaces } from "../types/StateTypes";
 
 export interface State {
     test: () => void;
@@ -7,6 +8,8 @@ export interface State {
     getHash: (data: string) => string;
     userId: string;
     setUserId: (userId: string) => void;
+    getUserSpaces: () => void;
+    userSpaces: UserSpaces;
 }
 
 const Context = createContext<State | undefined>(undefined);

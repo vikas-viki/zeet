@@ -22,7 +22,6 @@ function App() {
       if (userId === "") {
         axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
           if (res.data.message === "YES") {
-            console.log(res.data);
             setUserId(res.data.userId);
             navigate("/spaces");
           }
