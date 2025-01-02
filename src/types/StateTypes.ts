@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import SpaceCard from "../components/SpaceCard";
 
 export interface StateProps {
     children: ReactNode;
@@ -27,4 +28,14 @@ export type GoogleCredential = {
     nbf: integer;
     picture: string;
     sub: string;
+}
+
+export type SpaceProps = {
+    name: string;
+    id: string;
+    image: string;
+}
+
+export type SpaceCardProps = {
+    space: SpaceProps;
 }
