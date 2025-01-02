@@ -11,6 +11,7 @@ export interface State {
     getUserSpaces: () => void;
     userSpaces: UserSpaces;
     deleteSpace: (spaceName: string, spaceId: number) => void;
+    editSpace: (spaceName: string, spaceId: number, newSpaceName: string, toggleModel: CallableFunction) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

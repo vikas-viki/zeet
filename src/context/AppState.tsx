@@ -106,6 +106,26 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         }
     }
 
+    const editSpace = async (spaceName: string, spaceId: number, newSpaceName: string, toggleModel: CallableFunction) => {
+        try {
+            const response = await axios.post(`${SERVER_URL}/edit-space`, {
+                userId,
+                spaceId,
+                spaceName,
+                newSpaceName
+            }, { withCredentials: true });
+            if(response.status == 200 && response.data.message === "SUCCESS"){
+                await getUserSpaces();
+                toggleModel();
+                toast.success("Edit successful.");
+            }
+        } catch (e: any) {
+            if (e?.response?.data.message === "ERROR") {
+                toast.error("Error occurred!");
+            }
+        }
+    }
+
     function getUniqueId(username: string, email: string, password: string) {
         const input = `${SALT}_${username}${email}${password}_${SALT}`;
         const hash = CryptoJS.MD5(input).toString(CryptoJS.enc.Hex);
@@ -126,7 +146,8 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             setUserId,
             getUserSpaces,
             userSpaces,
-            deleteSpace
+            deleteSpace,
+            editSpace
         }
         }>
             {children}
