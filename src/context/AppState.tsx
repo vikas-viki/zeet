@@ -88,6 +88,24 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         return [];
     }
 
+    const deleteSpace = async (spaceName: string, spaceId: number) => {
+        try {
+            const response = await axios.post(`${SERVER_URL}/delete-space`, {
+                userId,
+                spaceId,
+                spaceName
+            }, { withCredentials: true });
+            if(response.status == 200 && response.data.message === "SUCCESS"){
+                await getUserSpaces();
+                toast.success("Delete successful.");
+            }
+        } catch (e: any) {
+            if (e?.response?.data.message === "ERROR") {
+                toast.error("Error occurred!");
+            }
+        }
+    }
+
     function getUniqueId(username: string, email: string, password: string) {
         const input = `${SALT}_${username}${email}${password}_${SALT}`;
         const hash = CryptoJS.MD5(input).toString(CryptoJS.enc.Hex);
@@ -107,7 +125,8 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             userId,
             setUserId,
             getUserSpaces,
-            userSpaces
+            userSpaces,
+            deleteSpace
         }
         }>
             {children}

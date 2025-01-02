@@ -1,8 +1,12 @@
 import React from "react";
 import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import { SpaceCardProps } from "../types/StateTypes";
+import { useMyContext } from "../context/Context";
 
 const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
+
+    const { deleteSpace } = useMyContext();
+
     return (
         <div className="space_card">
             <div
@@ -14,10 +18,13 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                 <EllipsisVertical stroke="#000" className="ellipsis icon" />
                 <div className="space_card_options">
                     <button>
-                        <Pencil className="space_card_opt" size={16}/> <span>Edit</span>
+                        <Pencil className="space_card_opt" size={16} /> <span>Edit</span>
                     </button>
-                    <button>
-                        <Trash className="space_card_opt"  size={16}/> <span>Delete</span>
+                    <button
+                        onClick={() => {
+                            deleteSpace(space.spacename, space.spaceid);
+                        }}>
+                        <Trash className="space_card_opt" size={16} /> <span>Delete</span>
                     </button>
                 </div>
             </div>

@@ -31,7 +31,7 @@ export type GoogleCredential = {
 
 export type SpaceProps = {
     spacename: string;
-    spaceid: string;
+    spaceid: number;
     spaceimage: string;
 }
 

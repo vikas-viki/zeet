@@ -10,6 +10,7 @@ export interface State {
     setUserId: (userId: string) => void;
     getUserSpaces: () => void;
     userSpaces: UserSpaces;
+    deleteSpace: (spaceName: string, spaceId: number) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

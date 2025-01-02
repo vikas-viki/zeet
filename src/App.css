@@ -481,6 +481,7 @@ form input {
   overflow: none;
   background-color: #080808;
   border-radius: 5px;
+  z-index: 2;
 }
 
 .space_card_options button {
