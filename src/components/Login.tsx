@@ -114,19 +114,6 @@ function App() {
         await authorize(_formData, signup, true);
     }
 
-    useEffect(() => {
-        try {
-            axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
-                if(res.data.message === "YES"){
-                    setUserId(res.data.userId);
-                    navigate("/spaces");
-                }
-            }).catch(console.log)
-        } catch (e) {
-            console.log(e);
-        }
-    }, []);
-
     return (
         <div className="auth_container">
             <div className="auth_card">

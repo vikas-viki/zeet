@@ -1,11 +1,11 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import Modal from "./Modal";
-import Context, { State } from "../context/Context";
+import { useMyContext } from "../context/Context";
 
 function Navbar() {
     const [modalOpen, setModalOpen] = useState(false);
     const [spaceName, setSpaceName] = useState("");
-    const { createSpace } = useContext(Context) as State;
+    const { createSpace } = useMyContext();
 
     const toggleModel = () => {
         setModalOpen(prev => !prev);
@@ -20,7 +20,7 @@ function Navbar() {
                         title="Create new space"
                         actionText="Create"
                         onClose={toggleModel}
-                        onAction={() => createSpace(spaceName)}
+                        onAction={() => createSpace(spaceName, toggleModel)}
                     >
                         <div className="space_modal_content">
                             <input

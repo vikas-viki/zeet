@@ -2,7 +2,7 @@ import { createContext, useContext } from "react";
 
 export interface State {
     test: () => void;
-    createSpace: (name: string) => void;
+    createSpace: (name: string, toggleModel: CallableFunction) => void;
     getUniqueId: (username: string, email: string, password: string) => string;
     getHash: (data: string) => string;
     userId: string;
