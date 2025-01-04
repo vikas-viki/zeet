@@ -1,6 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Acme&family=Noto+Sans+Warang+Citi&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Signika:wght@300..700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @import url('https://fonts.cdnfonts.com/css/euclid-circular-b');
 
+#root {
+  width: 100vw;
+  height: 100vh;
+}
+
 /*  *  */
 body {
   margin: 0;
@@ -10,8 +15,14 @@ body {
   font-family: 'Euclid Circular B', sans-serif;
 }
 
-.main {
+.main_padding {
   padding: 50px;
+}
+
+.main {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
 }
 
 /* Reused */
@@ -500,19 +511,20 @@ form input {
   text-align: left;
 }
 
-.space_card_options button:hover{
+.space_card_options button:hover {
   background-color: #ffffffdc;
 }
 
-.space_card_options button > span {
+.space_card_options button>span {
   align-self: flex-end;
   line-height: 16px;
   letter-spacing: 0.3px;
 }
 
-.space_card_title .ellipsis:hover + .space_card_options {
+.space_card_title .ellipsis:hover+.space_card_options {
   opacity: 1 !important;
 }
+
 .space_card_options:hover {
   opacity: 1 !important;
 }
@@ -530,4 +542,62 @@ form input {
   transition: opacity 0.3s ease;
   border-bottom-left-radius: 8.5px;
   border-bottom-right-radius: 8.5px;
+}
+
+/* Space */
+.space_main {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.game_container {
+  width: 100%;
+  height: 100%;
+  overflow: hidden; /* Prevent unnecessary scrollbars */
+  position: relative; /* Ensure it stacks correctly with siblings */
+  z-index: 1; /* Keep above other background elements */
+}
+
+.space_options {
+  z-index: 100;
+  position: absolute;
+  bottom: 50px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.space_join_call {
+  font-family: "Poppins", sans-serif;
+  outline: none;
+  border: none;
+  background-color: #28a745;
+  border-radius: 30px;
+  padding: 15px 20px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  width: auto;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.147);
+}
+
+.space_join_call:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+.space_join_call:active {
+  background-color: #1e7e34;
+  transform: translateY(0);
 }

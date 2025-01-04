@@ -3,17 +3,22 @@ import { EllipsisVertical, Pencil, Trash } from "lucide-react";
 import { SpaceCardProps } from "../types/StateTypes";
 import { useMyContext } from "../context/Context";
 import Modal from "./Modal";
+import { useNavigate } from "react-router-dom";
 
 const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [spaceName, setSpaceName] = useState("");
     const { editSpace, deleteSpace } = useMyContext();
 
+    const navigate = useNavigate();
+
     const toggleModel = () => {
         setModalOpen(prev => !prev);
     }
     return (
-        <div className="space_card">
+        <div className="space_card" onClick={()=>{
+            navigate("/space/123");
+        }}>
             <div
                 className="space_card_image"
                 style={{ backgroundImage: `url(${space.spaceimage})` }}

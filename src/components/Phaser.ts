@@ -6,6 +6,7 @@ import playerimg from "../map_assets/player.png";
 import pottedplants from "../map_assets/pottedplants.png";
 import office_pallete from "../map_assets/office_pallete.png";
 import { TileIndex, TilemapLayers } from "../types/PhaserTypes";
+import { eventBus } from "../helpers/EventBus";
 
 export class GameScene extends Phaser.Scene {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
@@ -35,6 +36,8 @@ export class GameScene extends Phaser.Scene {
 
         this.createPlayers();
 
+        this.cameras.main.startFollow(this.player);
+
         this.setLayerDepths();
 
         this.createColliders();
@@ -49,7 +52,7 @@ export class GameScene extends Phaser.Scene {
     update() {
         if (this.cursors && this.player) {
             this.player.setVelocity(0);
-
+            // console.log(this.cursors);
             if (this.cursors.left.isDown) {
                 this.player.setVelocityX(-160);
                 this.player.anims.play("left", true);
@@ -184,11 +187,14 @@ export class GameScene extends Phaser.Scene {
                             0x333333,
                             0.35
                         );
+
+                        eventBus.emit("JOIN_STAGE");
                     }
                 } else {
                     if (highlight) {
                         highlight.destroy(); // Remove the rectangle
                         highlight = null;    // Reset the reference
+                        eventBus.emit("LEAVE_STAGE");
                     }
                 }
             });

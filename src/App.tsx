@@ -23,7 +23,11 @@ function App() {
         axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
           if (res.data.message === "YES") {
             setUserId(res.data.userId);
-            navigate("/spaces");
+            if(window.location.pathname === "/"){
+              navigate("/spaces");
+            }else{
+              navigate(window.location.pathname);
+            }
           }
         }).catch(console.log);
       }
@@ -33,7 +37,7 @@ function App() {
   }, []);
 
   return (
-    <div className='main'>
+    <div className={`main ${window.location.pathname !== "/space/123" && "main_padding"}`}>
       <Routes>
         <Route path="/" element={<Hero />} />
         <Route path="/spaces" element={<Spaces />} />
