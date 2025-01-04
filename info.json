@@ -1,3 +1,6 @@
 {
-    "JOIN_STAGE": "Emitted when user is in the meet spot, but not joined yet."
+    "JOIN_STAGE": "Emitted when user enters the meet spot.",
+    "LEAVE_STAGE": "Emitted when user leaves the meet spot.",
+    "JOINED_STAGE": "Emitted when user joins the meet.",
+    "LEFT_STAGE": "Emitted when user leaves the meet."
 }

@@ -12,6 +12,12 @@ export interface State {
     userSpaces: UserSpaces;
     deleteSpace: (spaceName: string, spaceId: number) => void;
     editSpace: (spaceName: string, spaceId: number, newSpaceName: string, toggleModel: CallableFunction) => void;
+    joinedSpace: boolean;
+    setJoinedSpace: (joined: boolean) => void;
+    micOn: boolean;
+    setMicOn: (micOn: any) => void;
+    videoOn: boolean;
+    setVideoOn: (videoOn: any) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

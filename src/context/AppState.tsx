@@ -16,6 +16,9 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const [userId, setUserId] = React.useState<string>('');
     const [userSpaces, setUserSpaces] = React.useState<UserSpaces>([]);
     const [spaces, setSpaces] = React.useState<Spaces>([]);
+    const [joinedSpace, setJoinedSpace] = React.useState<boolean>(false);
+    const [micOn, setMicOn] = React.useState<boolean>(false);
+    const [videoOn, setVideoOn] = React.useState<boolean>(false);   
 
     const createSpace = async (name: string, toggleModel: CallableFunction) => {
         try {
@@ -147,7 +150,13 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             getUserSpaces,
             userSpaces,
             deleteSpace,
-            editSpace
+            editSpace,
+            joinedSpace, 
+            setJoinedSpace,
+            micOn, 
+            setMicOn,
+            videoOn,
+            setVideoOn
         }
         }>
             {children}

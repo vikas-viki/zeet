@@ -558,9 +558,12 @@ form input {
 .game_container {
   width: 100%;
   height: 100%;
-  overflow: hidden; /* Prevent unnecessary scrollbars */
-  position: relative; /* Ensure it stacks correctly with siblings */
-  z-index: 1; /* Keep above other background elements */
+  overflow: hidden;
+  /* Prevent unnecessary scrollbars */
+  position: relative;
+  /* Ensure it stacks correctly with siblings */
+  z-index: 1;
+  /* Keep above other background elements */
 }
 
 .space_options {
@@ -572,7 +575,9 @@ form input {
   justify-content: center;
 }
 
-.space_join_call {
+.space_join_call,
+.space_leave_call,
+.space_mic {
   font-family: "Poppins", sans-serif;
   outline: none;
   border: none;
@@ -600,4 +605,35 @@ form input {
 .space_join_call:active {
   background-color: #1e7e34;
   transform: translateY(0);
+}
+
+.space_leave_call {
+  background-color: #a72828;
+}
+
+
+.space_leave_call:hover {
+  background-color: #882121;
+  transform: translateY(-2px);
+}
+
+.space_leave_call:active {
+  background-color: #7e1e1e;
+  transform: translateY(0);
+}
+
+.space_joined_options {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+.space_mic {
+  border-radius: 10px;
+}
+
+.mic_off,
+.vid_off {
+  background-color: #a72828;
 }

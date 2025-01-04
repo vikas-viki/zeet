@@ -15,6 +15,10 @@ export class GameScene extends Phaser.Scene {
     private map!: Phaser.Tilemaps.Tilemap;
     private tileIndex: TileIndex = {};
 
+    // event states
+    private joinedStage: boolean = false;
+    private leftStage: boolean = false;
+
     constructor() {
         super({ key: "GameScene" });
     }
@@ -30,6 +34,8 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
+        this.loadEventListeners();
+
         this.loadTileIndexes();
 
         this.createTilemapAndLayers();
@@ -187,14 +193,15 @@ export class GameScene extends Phaser.Scene {
                             0x333333,
                             0.35
                         );
-
-                        eventBus.emit("JOIN_STAGE");
+                        if (!this.joinedStage)
+                            eventBus.emit("JOIN_STAGE");
                     }
                 } else {
                     if (highlight) {
                         highlight.destroy(); // Remove the rectangle
                         highlight = null;    // Reset the reference
-                        eventBus.emit("LEAVE_STAGE");
+                        if (this.joinedStage)
+                            eventBus.emit("LEAVE_STAGE");
                     }
                 }
             });
@@ -204,5 +211,16 @@ export class GameScene extends Phaser.Scene {
     private loadTileIndexes() {
         this.tileIndex["chairUp"] = 1006;
         this.tileIndex["chairDown"] = 956;
+    }
+
+    private loadEventListeners() {
+        eventBus.on("JOINED_STAGE", () => {
+            this.joinedStage = true;
+            this.leftStage = false;
+        });
+        eventBus.on("LEFT_STAGE", () => {
+            this.joinedStage = false;
+            this.leftStage = true;
+        })
     }
 }
