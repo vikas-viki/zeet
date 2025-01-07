@@ -10,14 +10,15 @@ export interface State {
     setUserId: (userId: string) => void;
     getUserSpaces: () => void;
     userSpaces: UserSpaces;
-    deleteSpace: (spaceName: string, spaceId: number) => void;
-    editSpace: (spaceName: string, spaceId: number, newSpaceName: string, toggleModel: CallableFunction) => void;
+    deleteSpace: (_roomId: string) => void;
+    editSpace: (_roomId: string, newSpaceName: string, toggleModel: CallableFunction) => void;
     joinedSpace: boolean;
     setJoinedSpace: (joined: boolean) => void;
     micOn: boolean;
     setMicOn: (micOn: any) => void;
     videoOn: boolean;
     setVideoOn: (videoOn: any) => void;
+    setRoomId: (roomId: string) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

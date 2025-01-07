@@ -21,8 +21,8 @@ function Spaces() {
             <Navbar />
             <div className="spaces_container">
                 {userSpaces.length > 0 ? (
-                    userSpaces.map((_space: any, i) => (
-                        <SpaceCard key={i} space={_space} />
+                    userSpaces.map((_space: any) => (
+                        <SpaceCard key={_space.roomId} space={_space} />
                     ))
                 ) : (
                     <span>No Space Found</span>

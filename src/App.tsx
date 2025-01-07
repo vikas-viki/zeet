@@ -23,7 +23,7 @@ function App() {
         axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
           if (res.data.message === "YES") {
             setUserId(res.data.userId);
-            if(window.location.pathname === "/"){
+            if(window.location.pathname === "/" || window.location.pathname === "/login"){
               navigate("/spaces");
             }else{
               navigate(window.location.pathname);

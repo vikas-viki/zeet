@@ -8,15 +8,17 @@ import { useNavigate } from "react-router-dom";
 const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [spaceName, setSpaceName] = useState("");
-    const { editSpace, deleteSpace } = useMyContext();
+    const { editSpace, deleteSpace, setRoomId } = useMyContext();
 
     const navigate = useNavigate();
 
     const toggleModel = () => {
         setModalOpen(prev => !prev);
     }
+
     return (
-        <div className="space_card" onClick={()=>{
+        <div className="space_card" onClick={() => {
+            setRoomId(space.roomId);
             navigate("/space/123");
         }}>
             <div
@@ -28,13 +30,18 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                 <EllipsisVertical stroke="#000" className="ellipsis icon" />
                 <div className="space_card_options">
                     <button
-                        onClick={toggleModel}
-                        >
+                        onClick={(e)=>{
+                            console.log(space.roomId)
+                            e.stopPropagation();
+                            toggleModel();
+                        }}
+                    >
                         <Pencil className="space_card_opt" size={16} /> <span>Edit</span>
                     </button>
                     <button
-                        onClick={() => {
-                            deleteSpace(space.spacename, space.spaceid);
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            deleteSpace(space.roomId);
                         }}>
                         <Trash className="space_card_opt" size={16} /> <span>Delete</span>
                     </button>
@@ -46,7 +53,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                         title="Edit Space"
                         actionText="Change"
                         onClose={toggleModel}
-                        onAction={() => editSpace(space.spacename, space.spaceid, spaceName, toggleModel)}
+                        onAction={() => editSpace(space.roomId, spaceName, toggleModel)}
                     >
                         <div className="space_modal_content">
                             <input

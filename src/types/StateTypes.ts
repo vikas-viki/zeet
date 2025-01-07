@@ -33,6 +33,7 @@ export type SpaceProps = {
     spacename: string;
     spaceid: number;
     spaceimage: string;
+    roomId: string;
 }
 
 export type SpaceCardProps = {
@@ -43,12 +44,14 @@ export type UserSpaces = {
     spaceimage: string;
     spaceid: number;
     spacename: string;
+    roomId: string;
 }[];
 
 export type UserSpacesResponse = {
     userid: string;
     spaceid: number;
     spacename: string;
+    roomid: string;
 }[];
 
 export type Spaces = {

@@ -4,6 +4,9 @@ import { Spaces, StateProps, UserSpaces, UserSpacesResponse } from "../types/Sta
 import CryptoJS from 'crypto-js';
 import axios from "axios";
 import toast from "react-hot-toast";
+import { io } from "socket.io-client";
+import { constants } from "../helpers/constants";
+import { v4 as uuidv4 } from 'uuid';
 
 const test = () => {
     console.log("Hello");
@@ -12,20 +15,27 @@ const test = () => {
 const SALT = import.meta.env.VITE_SALT;
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
+// const socket = io(SERVER_URL);
+
 const AppState: React.FC<StateProps> = ({ children }) => {
     const [userId, setUserId] = React.useState<string>('');
     const [userSpaces, setUserSpaces] = React.useState<UserSpaces>([]);
     const [spaces, setSpaces] = React.useState<Spaces>([]);
     const [joinedSpace, setJoinedSpace] = React.useState<boolean>(false);
     const [micOn, setMicOn] = React.useState<boolean>(false);
-    const [videoOn, setVideoOn] = React.useState<boolean>(false);   
+    const [videoOn, setVideoOn] = React.useState<boolean>(false);
+    const [roomId, setRoomId] = React.useState<string>('');
+    var socketId = '';
 
     const createSpace = async (name: string, toggleModel: CallableFunction) => {
+        var _roomId = `${userId}${uuidv4()}`;
+        console.log({ _roomId });
         try {
             const response = await axios.post(`${SERVER_URL}/create-space`, {
                 userId,
                 spaceId: 1,
-                spaceName: name
+                spaceName: name,
+                roomId: _roomId
             }, { withCredentials: true });
             if (response.status == 200 && response.data.message === "SUCCESS") {
                 await getUserSpaces();
@@ -55,6 +65,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
                 { withCredentials: true });
 
             if (response.data.message === "NO_SPACE_FOUND") {
+                setUserSpaces([]);
                 console.log("No space found!");
             } else {
                 const _userSpaces: UserSpacesResponse = response.data.userSpaces;
@@ -64,9 +75,11 @@ const AppState: React.FC<StateProps> = ({ children }) => {
                     user_spaces.push({
                         spaceimage: _space.spaceimage,
                         spaceid: _userSpaces[i].spaceid,
-                        spacename: _userSpaces[i].spacename
+                        spacename: _userSpaces[i].spacename,
+                        roomId: _userSpaces[i].roomid
                     });
                 }
+                console.log({ user_spaces });
                 setUserSpaces(user_spaces);
             }
         } catch (e: any) {
@@ -91,14 +104,13 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         return [];
     }
 
-    const deleteSpace = async (spaceName: string, spaceId: number) => {
+    const deleteSpace = async (_roomId: string) => {
         try {
             const response = await axios.post(`${SERVER_URL}/delete-space`, {
-                userId,
-                spaceId,
-                spaceName
+                roomId: _roomId,
+                userId
             }, { withCredentials: true });
-            if(response.status == 200 && response.data.message === "SUCCESS"){
+            if (response.status == 200 && response.data.message === "SUCCESS") {
                 await getUserSpaces();
                 toast.success("Delete successful.");
             }
@@ -109,15 +121,14 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         }
     }
 
-    const editSpace = async (spaceName: string, spaceId: number, newSpaceName: string, toggleModel: CallableFunction) => {
+    const editSpace = async (_roomId: string, newSpaceName: string, toggleModel: CallableFunction) => {
         try {
             const response = await axios.post(`${SERVER_URL}/edit-space`, {
-                userId,
-                spaceId,
-                spaceName,
-                newSpaceName
+                roomId: _roomId,
+                newSpaceName,
+                userId
             }, { withCredentials: true });
-            if(response.status == 200 && response.data.message === "SUCCESS"){
+            if (response.status == 200 && response.data.message === "SUCCESS") {
                 await getUserSpaces();
                 toggleModel();
                 toast.success("Edit successful.");
@@ -139,6 +150,14 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         return CryptoJS.MD5(`${SALT}_${data}_${SALT}`).toString(CryptoJS.enc.Hex);
     }
 
+    // socket.on("connect", () => {
+    //     socketId = socket.id || "";
+    // });
+
+    // const joinSpace = () => {
+    //     socket.emit(constants.spaceJoin, { userId, roomId })
+    // }
+
     return (
         <Context.Provider value={{
             test,
@@ -151,12 +170,13 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             userSpaces,
             deleteSpace,
             editSpace,
-            joinedSpace, 
+            joinedSpace,
             setJoinedSpace,
-            micOn, 
+            micOn,
             setMicOn,
             videoOn,
-            setVideoOn
+            setVideoOn,
+            setRoomId
         }
         }>
             {children}
