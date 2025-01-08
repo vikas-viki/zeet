@@ -19,7 +19,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
     return (
         <div className="space_card" onClick={() => {
             setRoomId(space.roomId);
-            navigate("/space/123");
+            navigate(`/space/${space.roomId.slice(-36)}`);
         }}>
             <div
                 className="space_card_image"

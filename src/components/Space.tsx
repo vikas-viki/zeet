@@ -2,17 +2,21 @@ import Phaser from "phaser";
 import { useEffect, useRef, useState } from "react";
 import { GameScene } from "./Phaser";
 import { eventBus } from "../helpers/EventBus";
-import { Mic, MicOff, PhoneCall, PhoneOff, Video, VideoOff } from "lucide-react";
+import { Mic, MicOff, PhoneCall, PhoneOff, Rocket, Video, VideoOff } from "lucide-react";
 import { useMyContext } from "../context/Context";
+import { useParams } from "react-router-dom";
 
 const Space = () => {
     const gameRef = useRef<Phaser.Game | null>(null);
     const gameContainerRef = useRef<HTMLDivElement | null>(null);
     const [joinStage, setJoinStage] = useState<boolean>(false);
 
-    const { joinedSpace, setJoinedSpace, micOn, setMicOn, videoOn, setVideoOn } = useMyContext();
+    const { joinedSpace, setJoinedSpace, micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId } = useMyContext();
+    const { id } = useParams();
 
     useEffect(() => {
+        setRoomId(id!);
+
         if (!gameRef.current) {
             const config: Phaser.Types.Core.GameConfig = {
                 type: Phaser.AUTO,
@@ -35,6 +39,7 @@ const Space = () => {
             document.addEventListener("resize", () => {
                 gameRef.current?.scale.resize(window.innerWidth, window.innerHeight);
             })
+
         }
 
         eventBus.on("JOIN_STAGE", () => {
@@ -48,9 +53,7 @@ const Space = () => {
             if (!joinedSpace)
                 setJoinStage(false);
         });
-
     }, [joinedSpace, joinStage]);
-
 
     return (
         <div className="space_main" >

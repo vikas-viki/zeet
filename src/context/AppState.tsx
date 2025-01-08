@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import Context from "./Context";
 import { Spaces, StateProps, UserSpaces, UserSpacesResponse } from "../types/StateTypes";
 import CryptoJS from 'crypto-js';
@@ -15,7 +15,7 @@ const test = () => {
 const SALT = import.meta.env.VITE_SALT;
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-// const socket = io(SERVER_URL);
+const socket = io(SERVER_URL);
 
 const AppState: React.FC<StateProps> = ({ children }) => {
     const [userId, setUserId] = React.useState<string>('');
@@ -150,13 +150,22 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         return CryptoJS.MD5(`${SALT}_${data}_${SALT}`).toString(CryptoJS.enc.Hex);
     }
 
-    // socket.on("connect", () => {
-    //     socketId = socket.id || "";
-    // });
+    socket.on("connect", () => {
+        console.log("Socket connected!");
+        socketId = socket.id || "";
+    });
 
-    // const joinSpace = () => {
-    //     socket.emit(constants.spaceJoin, { userId, roomId })
-    // }
+    socket.on(constants.server.userJoinedSpace, (data: any) => {
+        console.log("User joined! space");
+        console.log({ data });
+    });
+
+    useEffect(() => {
+        console.log("State", { userId, roomId });
+        if (userId !== '' && roomId !== '' && window.location.pathname.split("/").length > 2) {
+            socket.emit(constants.client.joinSpace, { userId, roomId: userId + roomId });
+        }
+    }, [roomId, userId]);
 
     return (
         <Context.Provider value={{

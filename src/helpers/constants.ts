@@ -1,5 +1,14 @@
 export const constants = {
-    spaceJoin: "1",
-    userJoin: "2",
-    space: "3"
+    client: {
+        joinSpace: "1.1",
+        joinRoom: "1.2",
+        leaveSpace: "1.3",
+        leaveRoom: "1.4",
+    },
+    server: {
+        userJoinedSpace: "2.1",
+        userLeftSpace: "2.2",
+        userJoinedRoom: "2.3",
+        userLeftRoom: "2.4",
+    }
 }
