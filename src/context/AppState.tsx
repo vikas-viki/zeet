@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { constants } from "../helpers/constants";
 import { v4 as uuidv4 } from 'uuid';
+import { useNavigate } from "react-router-dom";
 
 const test = () => {
     console.log("Hello");
@@ -15,7 +16,7 @@ const test = () => {
 const SALT = import.meta.env.VITE_SALT;
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-const socket = io(SERVER_URL);
+export const socket = io(SERVER_URL);
 
 const AppState: React.FC<StateProps> = ({ children }) => {
     const [userId, setUserId] = React.useState<string>('');
@@ -26,6 +27,8 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const [videoOn, setVideoOn] = React.useState<boolean>(false);
     const [roomId, setRoomId] = React.useState<string>('');
     var socketId = '';
+
+    const navigate = useNavigate();
 
     const createSpace = async (name: string, toggleModel: CallableFunction) => {
         var _roomId = `${userId}${uuidv4()}`;
@@ -160,13 +163,6 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         console.log({ data });
     });
 
-    useEffect(() => {
-        console.log("State", { userId, roomId });
-        if (userId !== '' && roomId !== '' && window.location.pathname.split("/").length > 2) {
-            socket.emit(constants.client.joinSpace, { userId, roomId: userId + roomId });
-        }
-    }, [roomId, userId]);
-
     return (
         <Context.Provider value={{
             test,
@@ -185,7 +181,8 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             setMicOn,
             videoOn,
             setVideoOn,
-            setRoomId
+            setRoomId,
+            roomId
         }
         }>
             {children}

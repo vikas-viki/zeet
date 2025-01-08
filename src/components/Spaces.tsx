@@ -9,12 +9,11 @@ function Spaces() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (userId === '') {
-            navigate('/login');
-        } else {
+        if (userId !== '') {
+            console.log("Getting user spaces");
             getUserSpaces();
         }
-    }, []);
+    }, [userId]);
 
     return (
         <div className="spaces">

@@ -28,13 +28,15 @@ function App() {
             } else {
               navigate(window.location.pathname);
             }
+          } else if (res.data.message === "NO") {
+            navigate("/login");
           }
         }).catch(console.log);
       }
     } catch (e) {
       console.log(e);
     }
-  }, []);
+  }, [userId]);
 
   return (
     <div className={`main ${window.location.pathname.split("/").length <= 2 && "main_padding"}`}>

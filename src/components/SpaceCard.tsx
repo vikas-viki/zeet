@@ -18,7 +18,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
 
     return (
         <div className="space_card" onClick={() => {
-            setRoomId(space.roomId);
+            setRoomId(space.roomId.slice(-36));
             navigate(`/space/${space.roomId.slice(-36)}`);
         }}>
             <div
@@ -30,7 +30,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                 <EllipsisVertical stroke="#000" className="ellipsis icon" />
                 <div className="space_card_options">
                     <button
-                        onClick={(e)=>{
+                        onClick={(e) => {
                             console.log(space.roomId)
                             e.stopPropagation();
                             toggleModel();

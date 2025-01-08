@@ -19,6 +19,7 @@ export interface State {
     videoOn: boolean;
     setVideoOn: (videoOn: any) => void;
     setRoomId: (roomId: string) => void;
+    roomId: string;
 }
 
 const Context = createContext<State | undefined>(undefined);
