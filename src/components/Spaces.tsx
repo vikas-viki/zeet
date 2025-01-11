@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import { useMyContext } from "../context/Context";
 import { useNavigate } from "react-router-dom";
 import SpaceCard from "./SpaceCard";
+import { SpaceProps } from "../types/StateTypes";
 
 function Spaces() {
     const { userId, getUserSpaces, userSpaces } = useMyContext();
@@ -20,8 +21,8 @@ function Spaces() {
             <Navbar />
             <div className="spaces_container">
                 {userSpaces.length > 0 ? (
-                    userSpaces.map((_space: any) => (
-                        <SpaceCard key={_space.roomId} space={_space} />
+                    userSpaces.map((_space: SpaceProps) => (
+                        <SpaceCard key={_space.spaceid} space={_space} />
                     ))
                 ) : (
                     <span>No Space Found</span>

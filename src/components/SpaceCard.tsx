@@ -18,8 +18,8 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
 
     return (
         <div className="space_card" onClick={() => {
-            setRoomId(space.roomId.slice(-36));
-            navigate(`/space/${space.roomId.slice(-36)}`);
+            setRoomId(space.spaceid);
+            navigate(`/space/${space.spaceid}`);
         }}>
             <div
                 className="space_card_image"
@@ -31,7 +31,6 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                 <div className="space_card_options">
                     <button
                         onClick={(e) => {
-                            console.log(space.roomId)
                             e.stopPropagation();
                             toggleModel();
                         }}
@@ -41,7 +40,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            deleteSpace(space.roomId);
+                            deleteSpace(space.spaceid);
                         }}>
                         <Trash className="space_card_opt" size={16} /> <span>Delete</span>
                     </button>
@@ -53,7 +52,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                         title="Edit Space"
                         actionText="Change"
                         onClose={toggleModel}
-                        onAction={() => editSpace(space.roomId, spaceName, toggleModel)}
+                        onAction={() => editSpace(space.spaceid, spaceName, toggleModel)}
                     >
                         <div className="space_modal_content">
                             <input

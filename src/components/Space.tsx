@@ -59,8 +59,7 @@ const Space = () => {
 
         if (
             userId === '' ||
-            userSpaces.length == 0 ||
-            userSpaces.filter(e => e.roomId === userId + id).length == 0
+            userSpaces.length == 0
         ) {
             gameRef.current?.destroy(true);
             navigate("/spaces");

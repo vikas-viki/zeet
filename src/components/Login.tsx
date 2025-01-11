@@ -102,7 +102,7 @@ function App() {
 
         _formData = {
             email: credentials.email,
-            password: `${credentials.sub}${getHash('__GOOGLE')}`,
+            password: `${credentials.sub}${getHash('GOOGLE')}`,
             rememberMe: formData.rememberMe,
             id: '',
             username: ''

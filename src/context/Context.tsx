@@ -10,8 +10,8 @@ export interface State {
     setUserId: (userId: string) => void;
     getUserSpaces: () => void;
     userSpaces: UserSpaces;
-    deleteSpace: (_roomId: string) => void;
-    editSpace: (_roomId: string, newSpaceName: string, toggleModel: CallableFunction) => void;
+    deleteSpace: (_spaceId: string) => void;
+    editSpace: (_spaceId: string, newSpaceName: string, toggleModel: CallableFunction) => void;
     joinedSpace: boolean;
     setJoinedSpace: (joined: boolean) => void;
     micOn: boolean;

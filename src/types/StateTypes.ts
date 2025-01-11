@@ -31,9 +31,8 @@ export type GoogleCredential = {
 
 export type SpaceProps = {
     spacename: string;
-    spaceid: number;
+    spaceid: string;
     spaceimage: string;
-    roomId: string;
 }
 
 export type SpaceCardProps = {
@@ -42,19 +41,21 @@ export type SpaceCardProps = {
 
 export type UserSpaces = {
     spaceimage: string;
-    spaceid: number;
+    spaceid: string;
     spacename: string;
-    roomId: string;
 }[];
 
 export type UserSpacesResponse = {
-    userid: string;
-    spaceid: number;
+    created_at: string;
+    mapid: string;
+    spaceid: string;
     spacename: string;
-    roomid: string;
+    userid: string;
 }[];
 
 export type Spaces = {
-    spaceid: number;
-    spaceimage: string;
+    mapid: string;
+    banner: string;
+    name: string;
+    map: any;
 }[];

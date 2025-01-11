@@ -21,6 +21,7 @@ function App() {
     try {
       if (userId === "") {
         axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
+          console.log(res.data);
           if (res.data.message === "YES") {
             setUserId(res.data.userId);
             if (window.location.pathname === "/" || window.location.pathname === "/login") {
@@ -31,10 +32,13 @@ function App() {
           } else if (res.data.message === "NO") {
             navigate("/login");
           }
-        }).catch(console.log);
+        }).catch((e)=>{
+          navigate("/login");
+          console.log("error", e);
+        });
       }
     } catch (e) {
-      console.log(e);
+      console.log("error ", e);
     }
   }, [userId]);
 

@@ -31,14 +31,11 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const navigate = useNavigate();
 
     const createSpace = async (name: string, toggleModel: CallableFunction) => {
-        var _roomId = `${userId}${uuidv4()}`;
-        console.log({ _roomId });
         try {
             const response = await axios.post(`${SERVER_URL}/create-space`, {
                 userId,
-                spaceId: 1,
                 spaceName: name,
-                roomId: _roomId
+                mapId: 'f6d3701d-79bb-4b8e-a001-98972ec281fc'
             }, { withCredentials: true });
             if (response.status == 200 && response.data.message === "SUCCESS") {
                 await getUserSpaces();
@@ -72,14 +69,14 @@ const AppState: React.FC<StateProps> = ({ children }) => {
                 console.log("No space found!");
             } else {
                 const _userSpaces: UserSpacesResponse = response.data.userSpaces;
+                console.log({ _userSpaces });
                 var user_spaces = [];
                 for (let i = 0; i < _userSpaces.length; i++) {
-                    let _space = _spaces.filter(e => e.spaceid == _userSpaces[i].spaceid)[0];
+                    let _space = _spaces.filter(e => e.mapid === _userSpaces[i].mapid)[0];
                     user_spaces.push({
-                        spaceimage: _space.spaceimage,
+                        spaceimage: _space.banner,
                         spaceid: _userSpaces[i].spaceid,
-                        spacename: _userSpaces[i].spacename,
-                        roomId: _userSpaces[i].roomid
+                        spacename: _userSpaces[i].spacename
                     });
                 }
                 console.log({ user_spaces });
@@ -98,7 +95,8 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const getSpaceDetails = async (): Promise<Spaces> => {
         try {
-            const response = await axios.post(`${SERVER_URL}/get-spaces`, { userId }, { withCredentials: true });
+            const response = await axios.post(`${SERVER_URL}/get-maps`, { userId }, { withCredentials: true });
+            console.log({ spaces: response.data.spaces });
             setSpaces(response.data.spaces);
             return response.data.spaces;
         } catch (e) {
@@ -107,10 +105,11 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         return [];
     }
 
-    const deleteSpace = async (_roomId: string) => {
+    const deleteSpace = async (_spaceId: string) => {
+        console.log("delete space", { _spaceId });
         try {
             const response = await axios.post(`${SERVER_URL}/delete-space`, {
-                roomId: _roomId,
+                spaceId: _spaceId,
                 userId
             }, { withCredentials: true });
             if (response.status == 200 && response.data.message === "SUCCESS") {
@@ -124,10 +123,10 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         }
     }
 
-    const editSpace = async (_roomId: string, newSpaceName: string, toggleModel: CallableFunction) => {
+    const editSpace = async (_spaceId: string, newSpaceName: string, toggleModel: CallableFunction) => {
         try {
             const response = await axios.post(`${SERVER_URL}/edit-space`, {
-                roomId: _roomId,
+                spaceId: _spaceId,
                 newSpaceName,
                 userId
             }, { withCredentials: true });
