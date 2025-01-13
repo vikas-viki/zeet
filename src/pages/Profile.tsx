@@ -9,7 +9,7 @@ const Profile = () => {
     const [newPassword, setNewPassword] = useState("");
     const [tempNewName, setTempNewName] = useState("CoolPlayer123");
 
-    const { updateNickName, userName, setUserName } = useMyContext();
+    const { updateNickName, userName, setUserName, updatePassword, userId } = useMyContext();
 
     const saveName = () => {
         updateNickName(tempNewName);
@@ -19,7 +19,7 @@ const Profile = () => {
 
     useEffect(() => {
         setTempNewName(userName);
-    }, [userName]);
+    }, [userName, userId]);
 
     return (
         <div className="profile_main">
@@ -55,6 +55,7 @@ const Profile = () => {
                         changePassword ? (
                             <div className="change_password_container">
                                 <input type="password" placeholder="Enter new password"
+                                    minLength={6}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                 />
@@ -62,6 +63,7 @@ const Profile = () => {
 
                                     <button className="save_password_button"
                                         onClick={() => {
+                                            updatePassword(newPassword);
                                             setChangePassword(false);
                                         }}
                                     >

@@ -13,7 +13,7 @@ const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function App() {
-    const { getUniqueId, getHash, setUserId } = useMyContext();
+    const { getUniqueId, getHash, setUserId, setUserName } = useMyContext();
     const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
     const [formData, setFormData] = useState<FormData>({
         email: '',
@@ -46,6 +46,7 @@ function App() {
 
                 if (response.status == 200) {
                     setUserId(response.data.userId);
+                    setUserName(response.data.userName);
                     toast.success("Signup successful.");
                     navigate("/spaces");
                 }
@@ -61,6 +62,7 @@ function App() {
                 if (response.status == 200) {
                     toast.success("Login successful.");
                     setUserId(response.data.userId);
+                    setUserName(response.data.userName);
                     navigate("/spaces")
                 }
 

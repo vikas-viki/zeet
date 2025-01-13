@@ -23,6 +23,7 @@ export interface State {
     updateNickName: (newName: string) => void;
     userName: string;
     setUserName: (name: string) => void;
+    updatePassword: (newPassword: string) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

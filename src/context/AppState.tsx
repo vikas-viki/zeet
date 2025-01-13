@@ -167,6 +167,23 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         }
     }
 
+    const updatePassword = async (password: string) => {
+        try {
+            const response = await axios.patch(`${SERVER_URL}/update-password`, {
+                userId,
+                password: getHash(password)
+            }, { withCredentials: true });
+            if (response.status == 200 && response.data.message === "SUCCESS") {
+                toast.success("Password updated!");
+            }else{
+                toast.error("Error updating passwprd!");
+            }
+        } catch (e) {
+            console.log(e);
+            toast.error("Error occurred!");
+        }
+    }
+
     const getHash = (data: string) => {
         return CryptoJS.MD5(`${SALT}_${data}_${SALT}`).toString(CryptoJS.enc.Hex);
     }
@@ -207,7 +224,8 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             roomId,
             updateNickName,
             userName, 
-            setUserName
+            setUserName,
+            updatePassword
         }
         }>
             {children}
