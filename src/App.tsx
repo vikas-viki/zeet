@@ -15,7 +15,7 @@ import Profile from "./pages/Profile";
 
 function App() {
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-  const { setUserId, userId } = useMyContext();
+  const { setUserId, userId, setUserName } = useMyContext();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -25,6 +25,7 @@ function App() {
           console.log(res.data);
           if (res.data.message === "YES") {
             setUserId(res.data.userId);
+            setUserName(res.data.userName);
             if (window.location.pathname === "/" || window.location.pathname === "/login") {
               navigate("/spaces");
             } else {

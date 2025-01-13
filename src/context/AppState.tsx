@@ -21,6 +21,7 @@ export const socket = io(SERVER_URL);
 
 const AppState: React.FC<StateProps> = ({ children }) => {
     const [userId, setUserId] = React.useState<string>('');
+    const [userName, setUserName] = React.useState<string>('');
     const [userSpaces, setUserSpaces] = React.useState<UserSpaces>([]);
     const [spaces, setSpaces] = React.useState<Spaces>([]);
     const [joinedSpace, setJoinedSpace] = React.useState<boolean>(false);
@@ -149,6 +150,23 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         return hash;
     }
 
+    const updateNickName = async (newUsername: string) => {
+        try {
+            const response = await axios.patch(`${SERVER_URL}/update-username`, {
+                userId,
+                newUsername
+            }, { withCredentials: true });
+            if (response.status == 200 && response.data.message === "SUCCESS") {
+                toast.success("Nickname updated!");
+            }else{
+                toast.error("Error updating nickname!");
+            }
+        } catch (e) {
+            console.log(e);
+            toast.error("Error occurred!");
+        }
+    }
+
     const getHash = (data: string) => {
         return CryptoJS.MD5(`${SALT}_${data}_${SALT}`).toString(CryptoJS.enc.Hex);
     }
@@ -163,7 +181,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         console.log({ data });
     });
 
-    socket.on("ping server 1", ()=>{
+    socket.on("ping server 1", () => {
         console.log("server 1 pinged");
     })
 
@@ -186,7 +204,10 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             videoOn,
             setVideoOn,
             setRoomId,
-            roomId
+            roomId,
+            updateNickName,
+            userName, 
+            setUserName
         }
         }>
             {children}

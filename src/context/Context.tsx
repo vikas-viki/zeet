@@ -20,6 +20,9 @@ export interface State {
     setVideoOn: (videoOn: any) => void;
     setRoomId: (roomId: string) => void;
     roomId: string;
+    updateNickName: (newName: string) => void;
+    userName: string;
+    setUserName: (name: string) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

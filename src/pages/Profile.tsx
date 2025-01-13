@@ -1,19 +1,25 @@
 import { KeyRound, Pencil, Save, X } from "lucide-react";
 import profile from "../assets/profile.png";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useMyContext } from "../context/Context";
 
 const Profile = () => {
     const [editName, setEditName] = useState(false);
-    const [nickname, setNickname] = useState("CoolPlayer123");
     const [changePassword, setChangePassword] = useState(false);
     const [newPassword, setNewPassword] = useState("");
     const [tempNewName, setTempNewName] = useState("CoolPlayer123");
 
+    const { updateNickName, userName, setUserName } = useMyContext();
+
     const saveName = () => {
-        console.log("Save name: ", nickname);
-        setNickname(tempNewName);
+        updateNickName(tempNewName);
+        setUserName(tempNewName);
         setEditName(false);
     }
+
+    useEffect(() => {
+        setTempNewName(userName);
+    }, [userName]);
 
     return (
         <div className="profile_main">
@@ -31,12 +37,12 @@ const Profile = () => {
                                 <Save size={17} onClick={saveName} />
                                 <X size={17} onClick={() => {
                                     setEditName(false);
-                                    setTempNewName(nickname);
+                                    setTempNewName(userName);
                                 }} />
                             </div>
                         ) : (
                             <div className="not_editing_name">
-                                <h1>{nickname}</h1>
+                                <h1>{userName}</h1>
                                 <Pencil size={17} onClick={() => {
                                     setEditName(true);
                                 }} />
