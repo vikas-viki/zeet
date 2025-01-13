@@ -57,6 +57,12 @@ const Space = () => {
                 setJoinStage(false);
         });
 
+        // eventBus.on("JOINED_STAGE", () => {
+        //     const room = "ROOM1";
+        //     console.log("joining room");
+        //     socket.emit(constants.client.joinRoom, { userId, roomId: `${id}.${room}` });
+        // })
+
         if (
             userId === '' ||
             userSpaces.length == 0
@@ -64,7 +70,7 @@ const Space = () => {
             gameRef.current?.destroy(true);
             navigate("/spaces");
         } else {
-            socket.emit(constants.client.joinSpace, { userId, roomId: userId + roomId });
+            socket.emit(constants.client.joinSpace, { userId, spaceId: id });
         }
     }, [joinedSpace, joinStage, userId, userSpaces]);
 

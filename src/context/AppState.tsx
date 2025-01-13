@@ -8,6 +8,7 @@ import { io } from "socket.io-client";
 import { constants } from "../helpers/constants";
 import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from "react-router-dom";
+import { eventBus } from "../helpers/EventBus";
 
 const test = () => {
     console.log("Hello");
@@ -161,6 +162,10 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         console.log("User joined! space");
         console.log({ data });
     });
+
+    socket.on("ping server 1", ()=>{
+        console.log("server 1 pinged");
+    })
 
     return (
         <Context.Provider value={{

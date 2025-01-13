@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Acme&family=Noto+Sans+Warang+Citi&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Signika:wght@300..700&family=Ubuntu+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&family=Playwrite+VN:wght@100..400&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.cdnfonts.com/css/euclid-circular-b');
 
 #root {
@@ -41,8 +41,9 @@ body {
 .navbar {
   display: flex;
   justify-content: end;
-  align-items: end;
+  align-items: center;
   padding: 0px 10px;
+  gap: 20px;
   padding-bottom: 10px;
   border-bottom: 2px solid lightgray;
 }
@@ -54,7 +55,7 @@ body {
   color: rgb(74, 74, 74);
 }
 
-.navbar button {
+.navbar .button {
   font-weight: 600;
   padding: 0.8rem 1.8rem;
   font-size: 1rem;
@@ -636,4 +637,162 @@ form input {
 .mic_off,
 .vid_off {
   background-color: #a72828;
+}
+
+.profile_icon {
+  border: none;
+  background-color: transparent;
+  outline: none;
+  cursor: pointer;
+  width: 60px;
+  height: 50px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+
+.profile_icon img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background-color: rgb(34, 34, 34);
+}
+
+.profile_main {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: start;
+}
+
+.profile_content {
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 500px;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.profile_container_1 {
+  padding: 25px;
+  padding-bottom: 20px;
+  padding-top: 35px;
+  background: linear-gradient(to right, #60a5fa, #a855f7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.profile_container_1 img {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile_container_1 div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+}
+
+.profile_container_1 svg {
+  cursor: pointer;
+}
+
+.not_editing_name {
+  font-family: serif;
+  font-weight: 600;
+  font-size: 1.6rem;
+}
+
+.not_editing_name h1{
+  font-family: "Poppins";
+  font-weight: 600;
+  font-size: 1.6rem;
+  margin: 0px;
+}
+
+.editing_name input{
+  border: 0.5px solid lightgrey;
+  outline: none;
+  color: black;
+  background-color: #fff;
+  font-family: "Poppins";
+  font-weight: 500;
+  font-size: 1rem;
+  width: max-content;
+  padding: 5px;
+  width: 60%;
+  padding-left: 10px;
+  border-radius: 10px;
+  margin: 0px;
+}
+
+.profile_container_2{
+  padding: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.change_password_button, .change_password_container input, .change_password_container button{
+  border: none;
+  outline: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 15px 20px;
+  border-radius: 10px;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: 500;
+  font-family: "Poppins";
+  cursor: pointer;
+}
+
+.change_password_container{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+}
+
+.change_password_container input {
+  background-color: rgb(230, 230, 230); 
+  width: 91%;
+}
+
+.change_password_container div{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  width: 100%;
+}
+
+.change_password_container div button {
+  width: 100%;
+}
+
+.save_password_button {
+  background-color: #9333ea;
+  color: #fff;
+}
+
+.change_password_button{
+   color: #181818ce;
 }

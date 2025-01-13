@@ -11,6 +11,7 @@ import Login from "./components/Login";
 import { useEffect } from "react";
 import axios from "axios";
 import { useMyContext } from "./context/Context";
+import Profile from "./pages/Profile";
 
 function App() {
   const SERVER_URL = import.meta.env.VITE_SERVER_URL;
@@ -32,7 +33,7 @@ function App() {
           } else if (res.data.message === "NO") {
             navigate("/login");
           }
-        }).catch((e)=>{
+        }).catch((e) => {
           navigate("/login");
           console.log("error", e);
         });
@@ -46,9 +47,10 @@ function App() {
     <div className={`main ${window.location.pathname.split("/").length <= 2 && "main_padding"}`}>
       <Routes>
         <Route path="/" element={<Hero />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/spaces" element={<Spaces />} />
         <Route path="/space/:id" element={<Space />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </div>
   )

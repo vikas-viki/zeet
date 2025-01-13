@@ -1,11 +1,15 @@
 import { useState } from "react";
 import Modal from "./Modal";
 import { useMyContext } from "../context/Context";
+import profile from "../assets/profile.png";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
     const [modalOpen, setModalOpen] = useState(false);
     const [spaceName, setSpaceName] = useState("");
     const { createSpace } = useMyContext();
+
+    const navigate = useNavigate();
 
     const toggleModel = () => {
         setModalOpen(prev => !prev);
@@ -14,6 +18,13 @@ function Navbar() {
         <div className="navbar">
             {/* <span className="navbar_title">Spaces</span> */}
             <button className="button" onClick={toggleModel}>Create new space</button>
+            <button className="profile_icon" 
+                onClick={()=>{
+                    navigate("/profile");
+                }}
+            >
+                <img src={profile} alt="U" />
+            </button>
             {
                 modalOpen && (
                     <Modal
