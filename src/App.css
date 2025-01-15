@@ -83,6 +83,12 @@ body {
   height: max-content;
 }
 
+.navbar .link_space{
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 /* Hero */
 .hero {
   display: flex;
@@ -444,7 +450,7 @@ form input {
 }
 
 .space_card_title span,
-.space_card_title .ellipsis {
+.space_card_title .hover {
   position: relative;
   z-index: 1;
 }
@@ -464,7 +470,7 @@ form input {
   transition: color 0.3s ease;
 }
 
-.space_card_title .ellipsis {
+.space_card_title .ellipsis, .space_card_title .linked{
   padding: 15px;
   margin: 0;
   transition: stroke 0.3s ease;
@@ -477,7 +483,7 @@ form input {
   color: white;
 }
 
-.space_card:hover .space_card_title .ellipsis {
+.space_card:hover .space_card_title .hover {
   stroke: #fff;
 }
 
@@ -530,6 +536,9 @@ form input {
   opacity: 1 !important;
 }
 
+.linked {
+  margin-bottom: 0px;
+}
 
 .space_card_title::before {
   content: '';

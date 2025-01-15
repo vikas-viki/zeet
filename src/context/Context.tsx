@@ -24,6 +24,7 @@ export interface State {
     userName: string;
     setUserName: (name: string) => void;
     updatePassword: (newPassword: string) => void;
+    linkSpace: (spaceId: string, toggleModel: CallableFunction) => void;
 }
 
 const Context = createContext<State | undefined>(undefined);

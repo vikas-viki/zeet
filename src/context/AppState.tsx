@@ -71,14 +71,15 @@ const AppState: React.FC<StateProps> = ({ children }) => {
                 console.log("No space found!");
             } else {
                 const _userSpaces: UserSpacesResponse = response.data.userSpaces;
-                console.log({ _userSpaces });
+                
                 var user_spaces = [];
                 for (let i = 0; i < _userSpaces.length; i++) {
                     let _space = _spaces.filter(e => e.mapid === _userSpaces[i].mapid)[0];
                     user_spaces.push({
                         spaceimage: _space.banner,
                         spaceid: _userSpaces[i].spaceid,
-                        spacename: _userSpaces[i].spacename
+                        spacename: _userSpaces[i].spacename,
+                        linked: userId !== _userSpaces[i].ownerid
                     });
                 }
                 console.log({ user_spaces });
@@ -158,7 +159,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             }, { withCredentials: true });
             if (response.status == 200 && response.data.message === "SUCCESS") {
                 toast.success("Nickname updated!");
-            }else{
+            } else {
                 toast.error("Error updating nickname!");
             }
         } catch (e) {
@@ -175,7 +176,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             }, { withCredentials: true });
             if (response.status == 200 && response.data.message === "SUCCESS") {
                 toast.success("Password updated!");
-            }else{
+            } else {
                 toast.error("Error updating passwprd!");
             }
         } catch (e) {
@@ -186,6 +187,31 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const getHash = (data: string) => {
         return CryptoJS.MD5(`${SALT}_${data}_${SALT}`).toString(CryptoJS.enc.Hex);
+    }
+
+    const linkSpace = async (spaceId: string, toggleModel: CallableFunction) => {
+        try {
+            const response = await axios.post(`${SERVER_URL}/link-space`,
+                {
+                    userId,
+                    spaceId
+                },
+                { withCredentials: true }
+            );
+
+            if (response.status == 200 && response.data.message === "SUCCESS") {
+                await getUserSpaces();
+                toast.success("Space linked!");
+            }
+        } catch (e:any) {
+            console.log(e.response);
+            if (e?.response?.data?.message === "NO_SPACE_FOUND") {
+                toast.error("Space not found!");
+            } else {
+                toast.error("Error linking space!");
+            }
+        }
+        toggleModel();
     }
 
     socket.on("connect", () => {
@@ -223,9 +249,10 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             setRoomId,
             roomId,
             updateNickName,
-            userName, 
+            userName,
             setUserName,
-            updatePassword
+            updatePassword,
+            linkSpace
         }
         }>
             {children}
