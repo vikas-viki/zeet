@@ -1,7 +1,7 @@
 import { KeyRound, Pencil, Save, X } from "lucide-react";
 import profile from "../assets/profile.png";
 import { useEffect, useState } from "react";
-import { useMyContext } from "../context/Context";
+import { useAppContext } from "../context/Contexts";
 
 const Profile = () => {
     const [editName, setEditName] = useState(false);
@@ -9,7 +9,7 @@ const Profile = () => {
     const [newPassword, setNewPassword] = useState("");
     const [tempNewName, setTempNewName] = useState("CoolPlayer123");
 
-    const { updateNickName, userName, setUserName, updatePassword, userId } = useMyContext();
+    const { updateNickName, userName, setUserName, updatePassword, userId } = useAppContext();
 
     const saveName = () => {
         updateNickName(tempNewName);

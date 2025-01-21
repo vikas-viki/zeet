@@ -6,14 +6,14 @@ import { jwtDecode } from "jwt-decode";
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FormData, GoogleCredential } from '../types/StateTypes';
-import { useMyContext } from '../context/Context';
+import { useAppContext } from '../context/Contexts';
 import toast from 'react-hot-toast';
+import { SERVER_URL } from '../context/AppState';
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 function App() {
-    const { getUniqueId, getHash, setUserId, setUserName } = useMyContext();
+    const { getUniqueId, getHash, setUserId, setUserName } = useAppContext();
     const [activeTab, setActiveTab] = useState<'login' | 'signup'>('login');
     const [formData, setFormData] = useState<FormData>({
         email: '',

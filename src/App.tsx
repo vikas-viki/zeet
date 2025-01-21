@@ -10,12 +10,12 @@ import Space from "./components/Space";
 import Login from "./components/Login";
 import { useEffect } from "react";
 import axios from "axios";
-import { useMyContext } from "./context/Context";
+import { useAppContext } from "./context/Contexts";
 import Profile from "./pages/Profile";
+import { SERVER_URL } from "./context/AppState";
 
 function App() {
-  const SERVER_URL = import.meta.env.VITE_SERVER_URL;
-  const { setUserId, userId, setUserName } = useMyContext();
+  const { setUserId, userId, setUserName } = useAppContext();
   const navigate = useNavigate();
 
   useEffect(() => {

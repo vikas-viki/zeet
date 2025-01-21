@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from "react";
 import { GameScene } from "./Phaser";
 import { eventBus } from "../helpers/EventBus";
 import { Mic, MicOff, PhoneCall, PhoneOff, Video, VideoOff } from "lucide-react";
-import { useMyContext } from "../context/Context";
+import { useAppContext } from "../context/Contexts";
 import { useNavigate, useParams } from "react-router-dom";
 import { constants } from "../helpers/constants";
-import { socket } from "../context/AppState";
+import { socket } from "../context/SocketState";
 
 const Space = () => {
     const gameRef = useRef<Phaser.Game | null>(null);
@@ -15,7 +15,7 @@ const Space = () => {
 
     const navigate = useNavigate();
 
-    const { joinedSpace, setJoinedSpace, micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces } = useMyContext();
+    const { joinedSpace, setJoinedSpace, micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces } = useAppContext();
     const { id } = useParams();
 
     useEffect(() => {
@@ -70,6 +70,7 @@ const Space = () => {
             gameRef.current?.destroy(true);
             navigate("/spaces");
         } else {
+            console.log("Joining space");
             socket.emit(constants.client.joinSpace, { userId, spaceId: id });
         }
     }, [joinedSpace, joinStage, userId, userSpaces]);

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Copy, EllipsisVertical, Link, Pencil, Trash } from "lucide-react";
 import { SpaceCardProps } from "../types/StateTypes";
-import { useMyContext } from "../context/Context";
+import { useAppContext } from "../context/Contexts";
 import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
     const [modalOpen, setModalOpen] = useState(false);
     const [spaceName, setSpaceName] = useState("");
-    const { editSpace, deleteSpace, setRoomId } = useMyContext();
+    const { editSpace, deleteSpace, setRoomId, unlinkSpace } = useAppContext();
 
     const navigate = useNavigate();
 
@@ -19,6 +19,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
 
     return (
         <div className="space_card" onClick={() => {
+            console.log({ space })
             setRoomId(space.spaceid);
             navigate(`/space/${space.spaceid}`);
         }}>
@@ -59,10 +60,22 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                             </div>
                         </>
                     ) : (
-                        <Link stroke="#000" className="linked icon hover"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                            }} />
+                        <>
+                            <Link stroke="#000" className="linked icon hover"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                }} />
+                            <div className="space_card_options" onClick={(e) => e.stopPropagation()}>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        unlinkSpace(space.spaceid);
+                                    }}>
+                                    <Trash className="space_card_opt" size={16} /> <span>Delete</span>
+                                </button>
+
+                            </div>
+                        </>
                     )
                 }
             </div>

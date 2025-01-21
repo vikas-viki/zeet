@@ -1,7 +1,7 @@
 import { createContext, useContext } from "react";
 import { UserSpaces } from "../types/StateTypes";
 
-export interface State {
+interface AppState {
     test: () => void;
     createSpace: (name: string, toggleModel: CallableFunction) => void;
     getUniqueId: (username: string, email: string, password: string) => string;
@@ -25,16 +25,30 @@ export interface State {
     setUserName: (name: string) => void;
     updatePassword: (newPassword: string) => void;
     linkSpace: (spaceId: string, toggleModel: CallableFunction) => void;
+    unlinkSpace: (spaceId: string) => void;
 }
 
-const Context = createContext<State | undefined>(undefined);
+export const AppContext = createContext<AppState | undefined>(undefined);
 
-export const useMyContext = (): State => {
-    const context = useContext(Context);
+export const useAppContext = (): AppState => {
+    const context = useContext(AppContext);
     if (!context) {
-        throw new Error("useMyContext must be used within a Context.Provider");
+        throw new Error("useAppContext must be used within a Context.Provider");
     }
     return context;
 };
 
-export default Context;
+// socket related state
+
+interface SocketState {
+};
+
+export const SocketContext = createContext<SocketState | undefined>(undefined);
+
+export const useSocketContext = (): SocketState => {
+    const context = useContext(SocketContext);
+    if (!context) {
+        throw new Error("useSocketContext must be used within a Context.Provider");
+    }
+    return context;
+};

@@ -1,23 +1,18 @@
-import React, { useEffect } from "react"
-import Context from "./Context";
+import React from "react"
+import { AppContext } from "./Contexts";
 import { Spaces, StateProps, UserSpaces, UserSpacesResponse } from "../types/StateTypes";
 import CryptoJS from 'crypto-js';
 import axios from "axios";
 import toast from "react-hot-toast";
-import { io } from "socket.io-client";
-import { constants } from "../helpers/constants";
-import { v4 as uuidv4 } from 'uuid';
 import { useNavigate } from "react-router-dom";
-import { eventBus } from "../helpers/EventBus";
 
 const test = () => {
     console.log("Hello");
 }
 
 const SALT = import.meta.env.VITE_SALT;
-const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
-export const socket = io(SERVER_URL);
+export const SERVER_URL = import.meta.env.VITE_SERVER_URL;
 
 const AppState: React.FC<StateProps> = ({ children }) => {
     const [userId, setUserId] = React.useState<string>('');
@@ -28,7 +23,6 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const [micOn, setMicOn] = React.useState<boolean>(false);
     const [videoOn, setVideoOn] = React.useState<boolean>(false);
     const [roomId, setRoomId] = React.useState<string>('');
-    var socketId = '';
 
     const navigate = useNavigate();
 
@@ -71,7 +65,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
                 console.log("No space found!");
             } else {
                 const _userSpaces: UserSpacesResponse = response.data.userSpaces;
-                
+
                 var user_spaces = [];
                 for (let i = 0; i < _userSpaces.length; i++) {
                     let _space = _spaces.filter(e => e.mapid === _userSpaces[i].mapid)[0];
@@ -203,7 +197,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
                 await getUserSpaces();
                 toast.success("Space linked!");
             }
-        } catch (e:any) {
+        } catch (e: any) {
             console.log(e.response);
             if (e?.response?.data?.message === "NO_SPACE_FOUND") {
                 toast.error("Space not found!");
@@ -214,22 +208,26 @@ const AppState: React.FC<StateProps> = ({ children }) => {
         toggleModel();
     }
 
-    socket.on("connect", () => {
-        console.log("Socket connected!");
-        socketId = socket.id || "";
-    });
-
-    socket.on(constants.server.userJoinedSpace, (data: any) => {
-        console.log("User joined! space");
-        console.log({ data });
-    });
-
-    socket.on("ping server 1", () => {
-        console.log("server 1 pinged");
-    })
+    const unlinkSpace = async (_spaceId: string) => {
+        console.log("unlink space", { _spaceId });
+        try {
+            const response = await axios.post(`${SERVER_URL}/unlink-space`, {
+                spaceId: _spaceId,
+                userId
+            }, { withCredentials: true });
+            if (response.status == 200 && response.data.message === "SUCCESS") {
+                await getUserSpaces();
+                toast.success("Delete successful.");
+            }
+        } catch (e: any) {
+            if (e?.response?.data.message === "ERROR") {
+                toast.error("Error occurred!");
+            }
+        }
+    }
 
     return (
-        <Context.Provider value={{
+        <AppContext.Provider value={{
             test,
             createSpace,
             getUniqueId,
@@ -252,11 +250,12 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             userName,
             setUserName,
             updatePassword,
-            linkSpace
+            linkSpace,
+            unlinkSpace
         }
         }>
             {children}
-        </Context.Provider>
+        </AppContext.Provider>
     )
 }
 

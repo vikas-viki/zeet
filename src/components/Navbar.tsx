@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Modal from "./Modal";
-import { useMyContext } from "../context/Context";
+import { useAppContext } from "../context/Contexts";
 import profile from "../assets/profile.png";
 import { useNavigate } from "react-router-dom";
 import { Link } from "lucide-react";
@@ -10,7 +10,7 @@ function Navbar() {
     const [modal2Open, setModal2Open] = useState(false);
     const [spaceName, setSpaceName] = useState("");
     const [spaceId, setSpaceId] = useState("");
-    const { createSpace, linkSpace } = useMyContext();
+    const { createSpace, linkSpace } = useAppContext();
 
     const navigate = useNavigate();
 

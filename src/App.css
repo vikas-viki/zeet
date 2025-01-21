@@ -83,12 +83,13 @@ body {
   height: max-content;
 }
 
-.navbar .link_space{
+.navbar .link_space {
   padding: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 /* Hero */
 .hero {
   display: flex;
@@ -470,7 +471,8 @@ form input {
   transition: color 0.3s ease;
 }
 
-.space_card_title .ellipsis, .space_card_title .linked{
+.space_card_title .ellipsis,
+.space_card_title .linked {
   padding: 15px;
   margin: 0;
   transition: stroke 0.3s ease;
@@ -494,7 +496,7 @@ form input {
   width: 110px;
   left: 270px;
   opacity: 0;
-  display: flex;
+  display: none;
   flex-direction: column;
   overflow: none;
   background-color: #080808;
@@ -502,7 +504,7 @@ form input {
   z-index: 2;
 }
 
-.space_card_options button {
+.space_card_options button{
   outline: none;
   background-color: #fff;
   font-family: "Poppins";
@@ -530,10 +532,20 @@ form input {
 
 .space_card_title .ellipsis:hover+.space_card_options {
   opacity: 1 !important;
+  margin-left: 10px;
+  display: flex;
+}
+
+.space_card_title .linked:hover+.space_card_options {
+  opacity: 1 !important;
+  margin-left: 10px;
+  display: flex;
 }
 
 .space_card_options:hover {
   opacity: 1 !important;
+  margin-left: 10px;
+  display: flex;
 }
 
 .linked {
@@ -725,14 +737,14 @@ form input {
   font-size: 1.6rem;
 }
 
-.not_editing_name h1{
+.not_editing_name h1 {
   font-family: "Poppins";
   font-weight: 600;
   font-size: 1.6rem;
   margin: 0px;
 }
 
-.editing_name input{
+.editing_name input {
   border: 0.5px solid lightgrey;
   outline: none;
   color: black;
@@ -748,14 +760,16 @@ form input {
   margin: 0px;
 }
 
-.profile_container_2{
+.profile_container_2 {
   padding: 25px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.change_password_button, .change_password_container input, .change_password_container button{
+.change_password_button,
+.change_password_container input,
+.change_password_container button {
   border: none;
   outline: none;
   display: flex;
@@ -771,7 +785,7 @@ form input {
   cursor: pointer;
 }
 
-.change_password_container{
+.change_password_container {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -781,11 +795,11 @@ form input {
 }
 
 .change_password_container input {
-  background-color: rgb(230, 230, 230); 
+  background-color: rgb(230, 230, 230);
   width: 91%;
 }
 
-.change_password_container div{
+.change_password_container div {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -802,6 +816,6 @@ form input {
   color: #fff;
 }
 
-.change_password_button{
-   color: #181818ce;
+.change_password_button {
+  color: #181818ce;
 }
