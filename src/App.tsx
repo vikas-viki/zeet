@@ -13,6 +13,7 @@ import axios from "axios";
 import { useAppContext } from "./context/Contexts";
 import Profile from "./pages/Profile";
 import { SERVER_URL } from "./context/AppState";
+import { eventBus } from "./helpers/EventBus";
 
 function App() {
   const { setUserId, userId, setUserName } = useAppContext();
@@ -24,6 +25,7 @@ function App() {
         axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
           console.log(res.data);
           if (res.data.message === "YES") {
+            window.localStorage.setItem("userId", res.data.userId);
             setUserId(res.data.userId);
             setUserName(res.data.userName);
             if (window.location.pathname === "/" || window.location.pathname === "/login") {

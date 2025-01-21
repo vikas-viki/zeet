@@ -7,6 +7,8 @@ import pottedplants from "../map_assets/pottedplants.png";
 import office_pallete from "../map_assets/office_pallete.png";
 import { TileIndex, TilemapLayers } from "../types/PhaserTypes";
 import { eventBus } from "../helpers/EventBus";
+import { constants } from "../helpers/constants";
+import { socket } from "../context/SocketState";
 
 export class GameScene extends Phaser.Scene {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
@@ -14,13 +16,25 @@ export class GameScene extends Phaser.Scene {
     private layers: TilemapLayers = {};
     private map!: Phaser.Tilemaps.Tilemap;
     private tileIndex: TileIndex = {};
+    private otherPlayers: { [id: string]: Phaser.Physics.Arcade.Sprite } = {};
 
     // event states
     private joinedStage: boolean = false;
     private leftStage: boolean = false;
+    public userId: string = "";
+    private velocity: { [key: string]: number } = {};
+    private stop: boolean = true;
 
     constructor() {
         super({ key: "GameScene" });
+
+        this.velocity = {
+            "left": -160,
+            "right": 160,
+            "up": -160,
+            "down": 160,
+            "stop": 0
+        }
     }
 
     preload() {
@@ -58,21 +72,29 @@ export class GameScene extends Phaser.Scene {
     update() {
         if (this.cursors && this.player) {
             this.player.setVelocity(0);
-            // console.log(this.cursors);
+
             if (this.cursors.left.isDown) {
+                this.movePlayer("left");
                 this.player.setVelocityX(-160);
                 this.player.anims.play("left", true);
+                this.stop = false;
             } else if (this.cursors.right.isDown) {
+                this.movePlayer("right");
                 this.player.setVelocityX(160);
                 this.player.anims.play("right", true);
+                this.stop = false;
             }
 
             if (this.cursors.up.isDown) {
+                this.movePlayer("up");
                 this.player.setVelocityY(-160);
                 this.player.anims.play("up", true);
+                this.stop = false;
             } else if (this.cursors.down.isDown) {
+                this.movePlayer("down");
                 this.player.setVelocityY(160);
                 this.player.anims.play("down", true);
+                this.stop = false;
             }
 
             if (
@@ -81,6 +103,10 @@ export class GameScene extends Phaser.Scene {
                 !this.cursors.up.isDown &&
                 !this.cursors.down.isDown
             ) {
+                if (!this.stop) {
+                    this.movePlayer("stop");
+                    this.stop = true;
+                }
                 this.player.setVelocity(0);
                 this.player.anims.pause();
             }
@@ -214,6 +240,29 @@ export class GameScene extends Phaser.Scene {
     }
 
     private loadEventListeners() {
+        socket.on(constants.server.userJoinedSpace, (data: { userId: string, spaceId: string }) => {
+            if (!this.otherPlayers[data.userId]) {
+                this.otherPlayers[data.userId] = this.physics.add.sprite(400, 400, "player", 0);
+            }
+        });
+
+        socket.on(constants.server.userMoved, (data: { userId: string, key: string }) => {
+            if (this.otherPlayers[data.userId]) {
+                this.otherPlayers[data.userId].setVelocity(0);
+                console.log("moving player, ", data.key);
+                if (data.key === "left" || data.key === "right") {
+                    this.otherPlayers[data.userId].setVelocityX(this.velocity[data.key]);
+                    this.otherPlayers[data.userId].anims.play(data.key, true);
+                } else if (data.key === "up" || data.key === "down") {
+                    this.otherPlayers[data.userId].setVelocityY(this.velocity[data.key]);
+                    this.otherPlayers[data.userId].anims.play(data.key, true);
+                } else {
+                    this.otherPlayers[data.userId].setVelocity(0);
+                    this.otherPlayers[data.userId].anims.stop();
+                }
+            }
+        })
+
         eventBus.on("JOINED_STAGE", () => {
             this.joinedStage = true;
             this.leftStage = false;
@@ -222,5 +271,16 @@ export class GameScene extends Phaser.Scene {
             this.joinedStage = false;
             this.leftStage = true;
         })
+        eventBus.on("USER_ID", (args: any[]) => {
+            console.log("userid", args);
+            this.userId = args[0];
+        })
+    }
+
+    private movePlayer(key: string) {
+        socket.emit(
+            constants.client.move,
+            { key, spaceId: window.location.pathname.split("/")[2], userId: window.localStorage.getItem("userId") }
+        );
     }
 }

@@ -73,6 +73,7 @@ const Space = () => {
             console.log("Joining space");
             socket.emit(constants.client.joinSpace, { userId, spaceId: id });
         }
+
     }, [joinedSpace, joinStage, userId, userSpaces]);
 
     return (
