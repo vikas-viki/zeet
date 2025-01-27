@@ -14,6 +14,7 @@ import { useAppContext } from "./context/Contexts";
 import Profile from "./pages/Profile";
 import { SERVER_URL } from "./context/AppState";
 import { eventBus } from "./helpers/EventBus";
+import { constants } from "./helpers/constants";
 
 function App() {
   const { setUserId, userId, setUserName } = useAppContext();

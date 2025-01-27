@@ -19,6 +19,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
 
     return (
         <div className="space_card" onClick={() => {
+            window.localStorage.setItem("spaceId", space.spaceid);
             console.log({ space })
             setRoomId(space.spaceid);
             navigate(`/space/${space.spaceid}`);

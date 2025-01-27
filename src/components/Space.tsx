@@ -57,11 +57,6 @@ const Space = () => {
                 setJoinStage(false);
         });
 
-        // eventBus.on("JOINED_STAGE", () => {
-        //     const room = "ROOM1";
-        //     console.log("joining room");
-        //     socket.emit(constants.client.joinRoom, { userId, roomId: `${id}.${room}` });
-        // })
 
         if (
             userId === '' ||
@@ -70,11 +65,21 @@ const Space = () => {
             gameRef.current?.destroy(true);
             navigate("/spaces");
         } else {
-            console.log("Joining space");
+            console.log("Joining space", window.localStorage.getItem("spaceId"));
             socket.emit(constants.client.joinSpace, { userId, spaceId: id });
         }
-
     }, [joinedSpace, joinStage, userId, userSpaces]);
+
+    useEffect(() => {
+        setTimeout(() => {
+            socket.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string } }[]) => {
+                console.log("other players location 1", data);
+                eventBus.emit(constants.server.playersLocation, data);
+            })
+            socket.emit(constants.client.reqLocation, { spaceId: id })
+        }, 2000);
+    }, [gameRef.current]);
+
 
     return (
         <div className="space_main" >

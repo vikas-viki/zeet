@@ -24,6 +24,7 @@ export class GameScene extends Phaser.Scene {
     public userId: string = "";
     private velocity: { [key: string]: number } = {};
     private stop: boolean = true;
+    private spaceId: string = "";
 
     constructor() {
         super({ key: "GameScene" });
@@ -48,8 +49,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     create() {
-        this.loadEventListeners();
-
         this.loadTileIndexes();
 
         this.createTilemapAndLayers();
@@ -67,22 +66,27 @@ export class GameScene extends Phaser.Scene {
         this.createInteractionHighlights();
 
         this.cursors = this.input.keyboard?.createCursorKeys();
+
+        this.loadEventListeners();
     }
 
     update() {
         if (this.cursors && this.player) {
             this.player.setVelocity(0);
 
+
             if (this.cursors.left.isDown) {
                 this.movePlayer("left");
                 this.player.setVelocityX(-160);
                 this.player.anims.play("left", true);
                 this.stop = false;
+                console.log("position: ", this.player.x, this.player.y);
             } else if (this.cursors.right.isDown) {
                 this.movePlayer("right");
                 this.player.setVelocityX(160);
                 this.player.anims.play("right", true);
                 this.stop = false;
+                console.log("position: ", this.player.x, this.player.y);
             }
 
             if (this.cursors.up.isDown) {
@@ -90,11 +94,13 @@ export class GameScene extends Phaser.Scene {
                 this.player.setVelocityY(-160);
                 this.player.anims.play("up", true);
                 this.stop = false;
+                console.log("position: ", this.player.x, this.player.y);
             } else if (this.cursors.down.isDown) {
                 this.movePlayer("down");
                 this.player.setVelocityY(160);
                 this.player.anims.play("down", true);
                 this.stop = false;
+                console.log("position: ", this.player.x, this.player.y);
             }
 
             if (
@@ -138,6 +144,8 @@ export class GameScene extends Phaser.Scene {
 
     private createPlayers() {
         this.player = this.physics.add.sprite(400, 400, "player", 0);
+        this.userId = window.localStorage.getItem("userId") || "";
+        this.spaceId = window.localStorage.getItem("spaceId") || "";
     }
 
     private createColliders() {
@@ -240,11 +248,22 @@ export class GameScene extends Phaser.Scene {
     }
 
     private loadEventListeners() {
+        eventBus.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string } }[]) => {
+            console.log("other players ", data, this.userId, this.physics);
+            data.forEach((user) => {
+                if (!this.otherPlayers[user.userId.toString()] && user.userId.toString() !== this.userId && Object(this.otherPlayers).length != 0)
+                    this.otherPlayers[user.userId.toString()] = this.physics?.add?.sprite(Number(user.x), Number(user.y), "player", 0);
+            })
+        })
+
         socket.on(constants.server.userJoinedSpace, (data: { userId: string, spaceId: string }) => {
             if (!this.otherPlayers[data.userId]) {
                 this.otherPlayers[data.userId] = this.physics.add.sprite(400, 400, "player", 0);
             }
+            console.log("spaceId: ", this.spaceId);
+            socket.emit(constants.client.location, { x: this.player.x, y: this.player.y, userId: this.userId, to: data.userId, spaceId: this.spaceId });
         });
+
 
         socket.on(constants.server.userMoved, (data: { userId: string, key: string }) => {
             if (this.otherPlayers[data.userId]) {
@@ -271,16 +290,25 @@ export class GameScene extends Phaser.Scene {
             this.joinedStage = false;
             this.leftStage = true;
         })
-        eventBus.on("USER_ID", (args: any[]) => {
-            console.log("userid", args);
-            this.userId = args[0];
-        })
     }
 
     private movePlayer(key: string) {
+        console.log("move event: ", {
+            key,
+            spaceId: window.localStorage.getItem("spaceId"),
+            userId: window.localStorage.getItem("userId"),
+            x: this.player.x,
+            y: this.player.y
+        });
         socket.emit(
             constants.client.move,
-            { key, spaceId: window.location.pathname.split("/")[2], userId: window.localStorage.getItem("userId") }
+            {
+                key,
+                spaceId: window.localStorage.getItem("spaceId"),
+                userId: window.localStorage.getItem("userId"),
+                x: this.player.x,
+                y: this.player.y
+            }
         );
     }
 }

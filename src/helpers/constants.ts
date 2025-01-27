@@ -5,6 +5,8 @@ export const constants = {
         leaveSpace: "1.3",
         leaveRoom: "1.4",
         move: "1.5",
+        location: "1.5",
+        reqLocation: "1.6"
     },
     server: {
         userJoinedSpace: "2.1",
@@ -12,5 +14,6 @@ export const constants = {
         userJoinedRoom: "2.3",
         userLeftRoom: "2.4",
         userMoved: "2.5",
+        playersLocation: "2.6"
     }
 }

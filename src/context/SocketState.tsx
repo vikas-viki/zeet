@@ -13,12 +13,16 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     socket.on("connect", () => {
         console.log("Socket connected!");
         socketId = socket.id || "";
+        document.title = socket.id!;
     });
 
     socket.on(constants.server.userJoinedSpace, (data: any) => {
         console.log("User joined! space");
         console.log({ data });
+        
     });
+
+
 
     return (
         <SocketContext.Provider value={{}}>
