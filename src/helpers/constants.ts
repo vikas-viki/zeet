@@ -5,8 +5,8 @@ export const constants = {
         leaveSpace: "1.3",
         leaveRoom: "1.4",
         move: "1.5",
-        location: "1.5",
-        reqLocation: "1.6"
+        location: "1.6",
+        reqLocation: "1.7"
     },
     server: {
         userJoinedSpace: "2.1",
@@ -20,5 +20,10 @@ export const constants = {
     events: {
         collidingJoin: "3.1",
         collidingLeave: "3.2",
+        joinedRoom: "3.3",
+        leftRoom: "3.4",
+    },
+    spaceRooms: {
+        room1: ".1"
     }
 }

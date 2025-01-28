@@ -17,7 +17,7 @@ const Space = () => {
 
     const { micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
-    const { joinedRoom, setJoinedRoom } = useSocketContext();
+    const { joinedRoom, setJoinedRoom, joinedSpace, setJoinedSpace } = useSocketContext();
 
     useEffect(() => {
         setRoomId(id!);
@@ -46,19 +46,6 @@ const Space = () => {
             })
         }
 
-        eventBus.on(constants.events.collidingJoin, () => {
-            console.log("User nearby ");
-            if (!joinedRoom)
-                setcollidingJoin(true);
-        });
-
-        eventBus.on(constants.events.collidingLeave, () => {
-            console.log("User left!");
-            if (!joinedRoom)
-                setcollidingJoin(false);
-        });
-
-
         if (
             userId === '' ||
             userSpaces.length == 0
@@ -66,8 +53,11 @@ const Space = () => {
             gameRef.current?.destroy(true);
             navigate("/spaces");
         } else {
-            console.log("Joining space", window.localStorage.getItem("spaceId"));
-            socket.emit(constants.client.joinSpace, { userId, spaceId: id, userName: userName.slice(0, 5) });
+            if (!joinedSpace) {
+                setJoinedSpace(true);
+                console.log("Joining space", window.localStorage.getItem("spaceId"));
+                socket.emit(constants.client.joinSpace, { userId, spaceId: id, userName: userName.slice(0, 5) });
+            }
         }
     }, [joinedRoom, collidingJoin, userId, userSpaces]);
 
@@ -81,17 +71,48 @@ const Space = () => {
         }, 2000);
     }, [gameRef.current]);
 
-    socket.on(constants.server.userJoinedSpace, (data) => {
-        if (joinedRoom) {
-            console.log("User joined space", data);
-        }
-    });
+    useEffect(() => {
+        eventBus.on(constants.events.collidingJoin, () => {
+            console.log("User nearby ");
+            if (!joinedRoom)
+                setcollidingJoin(true);
+        });
 
-    socket.on(constants.server.roomUsers, (data) => {
-        if (joinedRoom) {
-            console.log("room users", data);
-        }
-    })
+        eventBus.on(constants.events.collidingLeave, () => {
+            console.log("User left!");
+            if (!joinedRoom)
+                setcollidingJoin(false);
+        });
+
+        socket.on(constants.server.userJoinedRoom, (data) => {
+            console.log("User joined room");
+            if (joinedRoom) {
+                console.log(data);
+            }
+        })
+
+        socket.on(constants.server.roomUsers, (data) => {
+            console.log("room users");
+            if (joinedRoom) {
+                console.log(data);
+            }
+        });
+
+        socket.on(constants.server.userLeftRoom, (data) => {
+            console.log("User left room");
+            if (joinedRoom) {
+                console.log(data);
+            }
+        })
+
+        window.addEventListener("beforeunload", () => {
+            socket.emit(constants.client.leaveSpace, { userId, spaceId: id });
+        });
+
+        return () => {
+            socket.emit(constants.client.leaveSpace, { userId, spaceId: id });
+        };
+    }, []);
 
 
     return (
@@ -104,7 +125,7 @@ const Space = () => {
                         onClick={() => {
                             setJoinedRoom(true);
                             setcollidingJoin(false);
-                            eventBus.emit("JOINED_STAGE", { spaceId: id, userName });
+                            eventBus.emit(constants.events.joinedRoom, { spaceId: id, userName });
                         }}
                     > <PhoneCall /> <span>Join Stage</span>
                     </button>
@@ -141,7 +162,7 @@ const Space = () => {
                             onClick={() => {
                                 setcollidingJoin(false);
                                 setJoinedRoom(false);
-                                eventBus.emit("LEFT_STAGE");
+                                eventBus.emit(constants.events.leftRoom, { spaceId: id, userName });
                             }}
                         > <PhoneOff /> <span>Leave Stage</span>
                         </button>

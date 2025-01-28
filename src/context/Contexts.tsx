@@ -42,6 +42,8 @@ interface SocketState {
     socket: any;
     joinedRoom: boolean;
     setJoinedRoom: (joined: boolean) => void;
+    joinedSpace: boolean;
+    setJoinedSpace: (joined: boolean) => void;
 };
 
 export const SocketContext = createContext<SocketState | undefined>(undefined);

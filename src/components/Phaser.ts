@@ -279,6 +279,13 @@ export class GameScene extends Phaser.Scene {
             })
         })
 
+        socket.on(constants.server.userLeftSpace, (data: { userId: string }) => {
+            console.log("User left space", data);
+            this.otherPlayers[data.userId].player.destroy();
+            this.otherPlayers[data.userId].name.destroy();
+            delete this.otherPlayers[data.userId];
+        });
+
         socket.on(constants.server.userJoinedSpace, (data: { userId: string, spaceId: string, userName: string }) => {
             if (!this.otherPlayers[data.userId]) {
                 this.otherPlayers[data.userId] = {
@@ -292,7 +299,6 @@ export class GameScene extends Phaser.Scene {
             console.log("spaceId: ", this.spaceId);
             socket.emit(constants.client.location, { x: this.player.x, y: this.player.y, userId: this.userId, to: data.userId, spaceId: this.spaceId });
         });
-
 
         socket.on(constants.server.userMoved, (data: { userId: string, key: string }) => {
             if (this.otherPlayers[data.userId]) {
@@ -312,15 +318,16 @@ export class GameScene extends Phaser.Scene {
             }
         })
 
-        eventBus.on("JOINED_STAGE", (args: { spaceId: string, userName: string }) => {
+        eventBus.on(constants.events.joinedRoom, (args: { spaceId: string, userName: string }) => {
             this.joinedStage = true;
             this.leftStage = false;
-            socket.emit(constants.client.joinRoom, { userId: this.userId, spaceId: args.spaceId + ".ROOM1", userName: args.userName });
+            socket.emit(constants.client.joinRoom, { userId: this.userId, roomId: args.spaceId + constants.spaceRooms.room1, userName: args.userName });
         });
-        eventBus.on("LEFT_STAGE", () => {
+        eventBus.on(constants.events.leftRoom, () => {
             this.joinedStage = false;
             this.leftStage = true;
-        })
+            socket.emit(constants.client.leaveRoom, { userId: this.userId, roomId: this.spaceId + constants.spaceRooms.room1 });   
+        });
     }
 
     private movePlayer(key: string) {

@@ -8,6 +8,7 @@ import { constants } from "../helpers/constants";
 export const socket = io(SERVER_URL);
 const SocketState: React.FC<StateProps> = ({ children }) => {   
     const [joinedRoom, setJoinedRoom] = React.useState<boolean>(false);
+    const [joinedSpace, setJoinedSpace] = React.useState<boolean>(false);
     var socketId = '';
 
     socket.on("connect", () => {
@@ -28,7 +29,9 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         <SocketContext.Provider value={{
             socket,
             joinedRoom,
-            setJoinedRoom
+            setJoinedRoom,
+            joinedSpace,
+            setJoinedSpace
         }}>
             {children}
         </SocketContext.Provider>
