@@ -12,8 +12,6 @@ interface AppState {
     userSpaces: UserSpaces;
     deleteSpace: (_spaceId: string) => void;
     editSpace: (_spaceId: string, newSpaceName: string, toggleModel: CallableFunction) => void;
-    joinedSpace: boolean;
-    setJoinedSpace: (joined: boolean) => void;
     micOn: boolean;
     setMicOn: (micOn: any) => void;
     videoOn: boolean;
@@ -41,6 +39,9 @@ export const useAppContext = (): AppState => {
 // socket related state
 
 interface SocketState {
+    socket: any;
+    joinedRoom: boolean;
+    setJoinedRoom: (joined: boolean) => void;
 };
 
 export const SocketContext = createContext<SocketState | undefined>(undefined);

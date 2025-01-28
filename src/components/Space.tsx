@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { GameScene } from "./Phaser";
 import { eventBus } from "../helpers/EventBus";
 import { Mic, MicOff, PhoneCall, PhoneOff, Video, VideoOff } from "lucide-react";
-import { useAppContext } from "../context/Contexts";
+import { useAppContext, useSocketContext } from "../context/Contexts";
 import { useNavigate, useParams } from "react-router-dom";
 import { constants } from "../helpers/constants";
 import { socket } from "../context/SocketState";
@@ -11,12 +11,13 @@ import { socket } from "../context/SocketState";
 const Space = () => {
     const gameRef = useRef<Phaser.Game | null>(null);
     const gameContainerRef = useRef<HTMLDivElement | null>(null);
-    const [joinStage, setJoinStage] = useState<boolean>(false);
+    const [collidingJoin, setcollidingJoin] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
-    const { joinedSpace, setJoinedSpace, micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces, userName } = useAppContext();
+    const { micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
+    const { joinedRoom, setJoinedRoom } = useSocketContext();
 
     useEffect(() => {
         setRoomId(id!);
@@ -45,16 +46,16 @@ const Space = () => {
             })
         }
 
-        eventBus.on("JOIN_STAGE", () => {
+        eventBus.on(constants.events.collidingJoin, () => {
             console.log("User nearby ");
-            if (!joinedSpace)
-                setJoinStage(true);
+            if (!joinedRoom)
+                setcollidingJoin(true);
         });
 
-        eventBus.on("LEAVE_STAGE", () => {
+        eventBus.on(constants.events.collidingLeave, () => {
             console.log("User left!");
-            if (!joinedSpace)
-                setJoinStage(false);
+            if (!joinedRoom)
+                setcollidingJoin(false);
         });
 
 
@@ -68,7 +69,7 @@ const Space = () => {
             console.log("Joining space", window.localStorage.getItem("spaceId"));
             socket.emit(constants.client.joinSpace, { userId, spaceId: id, userName: userName.slice(0, 5) });
         }
-    }, [joinedSpace, joinStage, userId, userSpaces]);
+    }, [joinedRoom, collidingJoin, userId, userSpaces]);
 
     useEffect(() => {
         setTimeout(() => {
@@ -80,24 +81,36 @@ const Space = () => {
         }, 2000);
     }, [gameRef.current]);
 
+    socket.on(constants.server.userJoinedSpace, (data) => {
+        if (joinedRoom) {
+            console.log("User joined space", data);
+        }
+    });
+
+    socket.on(constants.server.roomUsers, (data) => {
+        if (joinedRoom) {
+            console.log("room users", data);
+        }
+    })
+
 
     return (
         <div className="space_main" >
             <div ref={gameContainerRef} className="game_container"></div>
             <div className="space_options">
                 {
-                    joinStage === true &&
+                    collidingJoin === true &&
                     <button className="space_join_call"
                         onClick={() => {
-                            setJoinedSpace(true);
-                            setJoinStage(false);
-                            eventBus.emit("JOINED_STAGE");
+                            setJoinedRoom(true);
+                            setcollidingJoin(false);
+                            eventBus.emit("JOINED_STAGE", { spaceId: id, userName });
                         }}
                     > <PhoneCall /> <span>Join Stage</span>
                     </button>
                 }
                 {
-                    joinedSpace === true &&
+                    joinedRoom === true &&
                     <div className="space_joined_options">
                         <button className={`space_mic ${micOn ? "mic_on" : "mic_off"}`}
                             onClick={() => {
@@ -126,8 +139,8 @@ const Space = () => {
                         <button className="space_leave_call"
                             id="space_leave_call"
                             onClick={() => {
-                                setJoinStage(false);
-                                setJoinedSpace(false);
+                                setcollidingJoin(false);
+                                setJoinedRoom(false);
                                 eventBus.emit("LEFT_STAGE");
                             }}
                         > <PhoneOff /> <span>Leave Stage</span>

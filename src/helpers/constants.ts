@@ -14,6 +14,11 @@ export const constants = {
         userJoinedRoom: "2.3",
         userLeftRoom: "2.4",
         userMoved: "2.5",
-        playersLocation: "2.6"
+        playersLocation: "2.6",
+        roomUsers: "2.7"
+    },
+    events: {
+        collidingJoin: "3.1",
+        collidingLeave: "3.2",
     }
 }

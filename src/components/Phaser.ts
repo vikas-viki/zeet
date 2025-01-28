@@ -244,14 +244,14 @@ export class GameScene extends Phaser.Scene {
                             0.35
                         );
                         if (!this.joinedStage)
-                            eventBus.emit("JOIN_STAGE");
+                            eventBus.emit(constants.events.collidingJoin);
                     }
                 } else {
                     if (highlight) {
                         highlight.destroy(); // Remove the rectangle
                         highlight = null;    // Reset the reference
                         if (this.joinedStage)
-                            eventBus.emit("LEAVE_STAGE");
+                            eventBus.emit(constants.events.collidingLeave);
                     }
                 }
             });
@@ -312,9 +312,10 @@ export class GameScene extends Phaser.Scene {
             }
         })
 
-        eventBus.on("JOINED_STAGE", () => {
+        eventBus.on("JOINED_STAGE", (args: { spaceId: string, userName: string }) => {
             this.joinedStage = true;
             this.leftStage = false;
+            socket.emit(constants.client.joinRoom, { userId: this.userId, spaceId: args.spaceId + ".ROOM1", userName: args.userName });
         });
         eventBus.on("LEFT_STAGE", () => {
             this.joinedStage = false;
