@@ -17,6 +17,7 @@ export class GameScene extends Phaser.Scene {
     private map!: Phaser.Tilemaps.Tilemap;
     private tileIndex: TileIndex = {};
     private otherPlayers: { [id: string]: { player: Phaser.Physics.Arcade.Sprite, name: Phaser.GameObjects.Text } } = {};
+    private colliders: Phaser.GameObjects.Rectangle[] = [];
 
     // event states
     private joinedStage: boolean = false;
@@ -26,6 +27,7 @@ export class GameScene extends Phaser.Scene {
     private stop: boolean = true;
     private spaceId: string = "";
     private textStyle: Phaser.Types.GameObjects.Text.TextStyle = {};
+
 
     constructor() {
         super({ key: "GameScene" });
@@ -165,7 +167,6 @@ export class GameScene extends Phaser.Scene {
 
     private createColliders() {
         const objectLayer = this.map.getObjectLayer("office_table");
-        const tableColliders: Phaser.GameObjects.Rectangle[] = [];
 
         objectLayer?.objects.forEach((object) => {
             if (object.x && object.y && object.width && object.height) {
@@ -176,11 +177,11 @@ export class GameScene extends Phaser.Scene {
                     object.height
                 );
                 this.physics.add.existing(collider, true);
-                tableColliders.push(collider);
+                this.colliders.push(collider);
             }
         });
 
-        tableColliders.forEach((collider) => {
+        this.colliders.forEach((collider) => {
             this.physics.add.collider(this.player, collider);
         });
     }
@@ -266,11 +267,15 @@ export class GameScene extends Phaser.Scene {
         eventBus.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string, userName: string } }[]) => {
             console.log("other players ", data, this.userId, this.physics);
             data.forEach((user) => {
-                if (!this.otherPlayers[user.userId.toString()] && user.userId.toString() !== this.userId && Object(this.otherPlayers).length != 0)
+                if (!this.otherPlayers[user.userId.toString()] && user.userId.toString() !== this.userId && Object(this.otherPlayers).length != 0) {
                     this.otherPlayers[user.userId.toString()] = {
                         player: this.physics?.add?.sprite(Number(user.x), Number(user.y), "player", 0),
-                        name: this.add.text(Number(user.x), Number(user.y)-20, user.userName.toString(), this.textStyle).setOrigin(0.5, 1)
+                        name: this.add.text(Number(user.x), Number(user.y) - 20, user.userName.toString(), this.textStyle).setOrigin(0.5, 1)
                     }
+                    this.colliders.forEach((collider) => {
+                        this.physics.add.collider(this.otherPlayers[user.userId.toString()].player, collider);
+                    });
+                }
             })
         })
 
@@ -280,6 +285,9 @@ export class GameScene extends Phaser.Scene {
                     player: this.physics.add.sprite(400, 400, "player", 0),
                     name: this.add.text(400, 380, data.userName.toString(), this.textStyle).setOrigin(0.5, 1)
                 }
+                this.colliders.forEach((collider) => {
+                    this.physics.add.collider(this.otherPlayers[data.userId.toString()].player, collider);
+                });
             }
             console.log("spaceId: ", this.spaceId);
             socket.emit(constants.client.location, { x: this.player.x, y: this.player.y, userId: this.userId, to: data.userId, spaceId: this.spaceId });
