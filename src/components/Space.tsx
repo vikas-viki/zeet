@@ -15,7 +15,7 @@ const Space = () => {
 
     const navigate = useNavigate();
 
-    const { joinedSpace, setJoinedSpace, micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces } = useAppContext();
+    const { joinedSpace, setJoinedSpace, micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
 
     useEffect(() => {
@@ -66,7 +66,7 @@ const Space = () => {
             navigate("/spaces");
         } else {
             console.log("Joining space", window.localStorage.getItem("spaceId"));
-            socket.emit(constants.client.joinSpace, { userId, spaceId: id });
+            socket.emit(constants.client.joinSpace, { userId, spaceId: id, userName: userName.slice(0, 5) });
         }
     }, [joinedSpace, joinStage, userId, userSpaces]);
 

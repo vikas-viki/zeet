@@ -13,8 +13,6 @@ import axios from "axios";
 import { useAppContext } from "./context/Contexts";
 import Profile from "./pages/Profile";
 import { SERVER_URL } from "./context/AppState";
-import { eventBus } from "./helpers/EventBus";
-import { constants } from "./helpers/constants";
 
 function App() {
   const { setUserId, userId, setUserName } = useAppContext();
@@ -27,6 +25,7 @@ function App() {
           console.log(res.data);
           if (res.data.message === "YES") {
             window.localStorage.setItem("userId", res.data.userId);
+            window.localStorage.setItem("userName", res.data.userName);
             setUserId(res.data.userId);
             setUserName(res.data.userName);
             if (window.location.pathname === "/" || window.location.pathname === "/login") {

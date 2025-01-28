@@ -16,7 +16,7 @@ export class GameScene extends Phaser.Scene {
     private layers: TilemapLayers = {};
     private map!: Phaser.Tilemaps.Tilemap;
     private tileIndex: TileIndex = {};
-    private otherPlayers: { [id: string]: Phaser.Physics.Arcade.Sprite } = {};
+    private otherPlayers: { [id: string]: { player: Phaser.Physics.Arcade.Sprite, name: Phaser.GameObjects.Text } } = {};
 
     // event states
     private joinedStage: boolean = false;
@@ -25,6 +25,7 @@ export class GameScene extends Phaser.Scene {
     private velocity: { [key: string]: number } = {};
     private stop: boolean = true;
     private spaceId: string = "";
+    private textStyle: Phaser.Types.GameObjects.Text.TextStyle = {};
 
     constructor() {
         super({ key: "GameScene" });
@@ -35,6 +36,15 @@ export class GameScene extends Phaser.Scene {
             "up": -160,
             "down": 160,
             "stop": 0
+        }
+
+        this.textStyle = {
+            fontSize: "12px",
+            color: "#ffffff",
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            padding: { x: 6, y: 3 },
+            fontFamily: "sans",
+            fontStyle: "bold",
         }
     }
 
@@ -116,6 +126,8 @@ export class GameScene extends Phaser.Scene {
                 this.player.setVelocity(0);
                 this.player.anims.pause();
             }
+
+            this.player.getData("name")?.setPosition(this.player.x, this.player.y - 20);
         }
     }
 
@@ -144,6 +156,9 @@ export class GameScene extends Phaser.Scene {
 
     private createPlayers() {
         this.player = this.physics.add.sprite(400, 400, "player", 0);
+        this.player.setData("name",
+            this.add.text(400, 380, window.localStorage.getItem("userName")?.slice(0, 5)!, this.textStyle).setOrigin(0.5, 1)
+        )
         this.userId = window.localStorage.getItem("userId") || "";
         this.spaceId = window.localStorage.getItem("spaceId") || "";
     }
@@ -248,17 +263,23 @@ export class GameScene extends Phaser.Scene {
     }
 
     private loadEventListeners() {
-        eventBus.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string } }[]) => {
+        eventBus.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string, userName: string } }[]) => {
             console.log("other players ", data, this.userId, this.physics);
             data.forEach((user) => {
                 if (!this.otherPlayers[user.userId.toString()] && user.userId.toString() !== this.userId && Object(this.otherPlayers).length != 0)
-                    this.otherPlayers[user.userId.toString()] = this.physics?.add?.sprite(Number(user.x), Number(user.y), "player", 0);
+                    this.otherPlayers[user.userId.toString()] = {
+                        player: this.physics?.add?.sprite(Number(user.x), Number(user.y), "player", 0),
+                        name: this.add.text(Number(user.x), Number(user.y)-20, user.userName.toString(), this.textStyle).setOrigin(0.5, 1)
+                    }
             })
         })
 
-        socket.on(constants.server.userJoinedSpace, (data: { userId: string, spaceId: string }) => {
+        socket.on(constants.server.userJoinedSpace, (data: { userId: string, spaceId: string, userName: string }) => {
             if (!this.otherPlayers[data.userId]) {
-                this.otherPlayers[data.userId] = this.physics.add.sprite(400, 400, "player", 0);
+                this.otherPlayers[data.userId] = {
+                    player: this.physics.add.sprite(400, 400, "player", 0),
+                    name: this.add.text(400, 380, data.userName.toString(), this.textStyle).setOrigin(0.5, 1)
+                }
             }
             console.log("spaceId: ", this.spaceId);
             socket.emit(constants.client.location, { x: this.player.x, y: this.player.y, userId: this.userId, to: data.userId, spaceId: this.spaceId });
@@ -267,18 +288,19 @@ export class GameScene extends Phaser.Scene {
 
         socket.on(constants.server.userMoved, (data: { userId: string, key: string }) => {
             if (this.otherPlayers[data.userId]) {
-                this.otherPlayers[data.userId].setVelocity(0);
+                this.otherPlayers[data.userId].player.setVelocity(0);
                 console.log("moving player, ", data.key);
                 if (data.key === "left" || data.key === "right") {
-                    this.otherPlayers[data.userId].setVelocityX(this.velocity[data.key]);
-                    this.otherPlayers[data.userId].anims.play(data.key, true);
+                    this.otherPlayers[data.userId].player.setVelocityX(this.velocity[data.key]);
+                    this.otherPlayers[data.userId].player.anims.play(data.key, true);
                 } else if (data.key === "up" || data.key === "down") {
-                    this.otherPlayers[data.userId].setVelocityY(this.velocity[data.key]);
-                    this.otherPlayers[data.userId].anims.play(data.key, true);
+                    this.otherPlayers[data.userId].player.setVelocityY(this.velocity[data.key]);
+                    this.otherPlayers[data.userId].player.anims.play(data.key, true);
                 } else {
-                    this.otherPlayers[data.userId].setVelocity(0);
-                    this.otherPlayers[data.userId].anims.stop();
+                    this.otherPlayers[data.userId].player.setVelocity(0);
+                    this.otherPlayers[data.userId].player.anims.stop();
                 }
+                this.otherPlayers[data.userId].name.setPosition(this.otherPlayers[data.userId].player.x, this.otherPlayers[data.userId].player.y - 20)
             }
         })
 
@@ -293,13 +315,6 @@ export class GameScene extends Phaser.Scene {
     }
 
     private movePlayer(key: string) {
-        console.log("move event: ", {
-            key,
-            spaceId: window.localStorage.getItem("spaceId"),
-            userId: window.localStorage.getItem("userId"),
-            x: this.player.x,
-            y: this.player.y
-        });
         socket.emit(
             constants.client.move,
             {
