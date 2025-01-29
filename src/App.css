@@ -504,7 +504,7 @@ form input {
   z-index: 2;
 }
 
-.space_card_options button{
+.space_card_options button {
   outline: none;
   background-color: #fff;
   font-family: "Poppins";
@@ -599,7 +599,8 @@ form input {
 
 .space_join_call,
 .space_leave_call,
-.space_mic {
+.space_mic,
+.space_room_users {
   font-family: "Poppins", sans-serif;
   outline: none;
   border: none;
@@ -633,6 +634,65 @@ form input {
   background-color: #a72828;
 }
 
+.space_room_users {
+  background-color: grey;
+  position: absolute;
+  right: 50px;
+  padding: 15px;
+}
+
+#space_room_users_card{
+  display: block;
+}
+
+.space_room_users_card {
+  display: flex;
+  max-width: 300px;
+  gap: 10px;
+  position: absolute;
+  flex-direction: column;
+  bottom: 100px;
+  right: 50px;
+  background-color: rgba(160, 160, 160, 0.682);
+  border-radius: 20px;
+  padding: 20px;
+  transition: all 0.3s ease-out;
+}
+
+.hide {
+  opacity: 0!important;
+}
+
+.visible {
+  opacity: 1!important;
+}
+.space_room_title{
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 5px;
+}
+
+.space_room_user {
+  padding: 15px 22px;
+  font-size: 18px;
+  border-radius: 50%;
+  font-weight: 600;
+  color: white;
+  font-family: "Poppins";
+  display: block;
+  user-select: none;
+  cursor: pointer;
+}
+
+.space_room_users_list{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.space_room_users:hover {
+  background-color: #6c757d;
+}
 
 .space_leave_call:hover {
   background-color: #882121;

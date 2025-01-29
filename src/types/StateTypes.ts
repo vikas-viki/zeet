@@ -62,3 +62,14 @@ export type Spaces = {
     name: string;
     map: any;
 }[];
+
+export type RoomUsers = {
+    [userId: string]: {
+        userName: string;
+        color: string;
+    }
+};
+
+export type OtherUsers = {
+    [userId: string]: string;
+}

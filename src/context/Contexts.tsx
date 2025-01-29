@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import { UserSpaces } from "../types/StateTypes";
+import { RoomUsers, UserSpaces } from "../types/StateTypes";
 
 interface AppState {
     test: () => void;
@@ -44,6 +44,7 @@ interface SocketState {
     setJoinedRoom: (joined: boolean) => void;
     joinedSpace: boolean;
     setJoinedSpace: (joined: boolean) => void;
+    roomUsers: RoomUsers;
 };
 
 export const SocketContext = createContext<SocketState | undefined>(undefined);

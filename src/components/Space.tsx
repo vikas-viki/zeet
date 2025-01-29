@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { useEffect, useRef, useState } from "react";
 import { GameScene } from "./Phaser";
 import { eventBus } from "../helpers/EventBus";
-import { Mic, MicOff, PhoneCall, PhoneOff, Video, VideoOff } from "lucide-react";
+import { Mic, MicOff, PhoneCall, PhoneOff, Users, Video, VideoOff } from "lucide-react";
 import { useAppContext, useSocketContext } from "../context/Contexts";
 import { useNavigate, useParams } from "react-router-dom";
 import { constants } from "../helpers/constants";
@@ -12,12 +12,13 @@ const Space = () => {
     const gameRef = useRef<Phaser.Game | null>(null);
     const gameContainerRef = useRef<HTMLDivElement | null>(null);
     const [collidingJoin, setcollidingJoin] = useState<boolean>(false);
-
+    const [showRoomUsers, setShowRoomUsers] = useState<boolean>(false);
     const navigate = useNavigate();
 
     const { micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
-    const { joinedRoom, setJoinedRoom, joinedSpace, setJoinedSpace } = useSocketContext();
+    const { joinedRoom, setJoinedRoom, joinedSpace, setJoinedSpace, roomUsers } = useSocketContext();
+
 
     useEffect(() => {
         setRoomId(id!);
@@ -166,6 +167,26 @@ const Space = () => {
                             }}
                         > <PhoneOff /> <span>Leave Stage</span>
                         </button>
+                        <button className="space_room_users"
+                            onClick={() => {
+                                setShowRoomUsers((prev: any) => !prev);
+                            }}
+                        >
+                            <Users />
+                        </button>
+                        <div className={`space_room_users_card ${showRoomUsers ? "visible" : "hide"}`} >
+                            <span className="space_room_title">Room Users</span>
+                            <div className="space_room_users_list">
+                                {
+                                    Object.values(roomUsers).map((user, i) => {
+                                        return (
+                                            <span key={i} title={user.userName} className="space_room_user" style={{ backgroundColor: `rgb(${user.color})` }}>{user.userName.slice(0, 1).toUpperCase()}</span>
+                                        )
+                                    })
+                                }
+                            </div>
+                        </div>
+
                     </div>
                 }
             </div>

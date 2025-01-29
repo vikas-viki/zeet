@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Copy, EllipsisVertical, Link, Pencil, Trash } from "lucide-react";
+import { Copy, EllipsisVertical, Link, Pencil, Share, Trash } from "lucide-react";
 import { SpaceCardProps } from "../types/StateTypes";
 import { useAppContext } from "../context/Contexts";
 import Modal from "./Modal";
@@ -56,7 +56,7 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
                                         window.navigator.clipboard.writeText(space.spaceid);
                                         toast.success("Space ID copied to clipboard.");
                                     }}>
-                                    <Copy className="space_card_opt" size={16} /> <span>Copy</span>
+                                    <Share className="space_card_opt" size={16} /> <span>Share</span>
                                 </button>
                             </div>
                         </>
