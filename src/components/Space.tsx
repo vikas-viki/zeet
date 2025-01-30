@@ -14,11 +14,12 @@ const Space = () => {
     const [collidingJoin, setcollidingJoin] = useState<boolean>(false);
     const [showRoomUsers, setShowRoomUsers] = useState<boolean>(false);
     const [showChat, setShowChat] = useState<boolean>(false);
+    const [messageInput, setMessageInput] = useState<string>("");
     const navigate = useNavigate();
 
     const { micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
-    const { joinedRoom, setJoinedRoom, joinedSpace, setJoinedSpace, roomUsers } = useSocketContext();
+    const { joinedRoom, setJoinedRoom, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
 
 
     useEffect(() => {
@@ -86,27 +87,6 @@ const Space = () => {
                 setcollidingJoin(false);
         });
 
-        socket.on(constants.server.userJoinedRoom, (data) => {
-            console.log("User joined room");
-            if (joinedRoom) {
-                console.log(data);
-            }
-        })
-
-        socket.on(constants.server.roomUsers, (data) => {
-            console.log("room users");
-            if (joinedRoom) {
-                console.log(data);
-            }
-        });
-
-        socket.on(constants.server.userLeftRoom, (data) => {
-            console.log("User left room");
-            if (joinedRoom) {
-                console.log(data);
-            }
-        })
-
         window.addEventListener("beforeunload", () => {
             socket.emit(constants.client.leaveSpace, { userId, spaceId: id });
         });
@@ -115,7 +95,6 @@ const Space = () => {
             socket.emit(constants.client.leaveSpace, { userId, spaceId: id });
         };
     }, []);
-
 
     return (
         <div className="space_main" >
@@ -185,65 +164,29 @@ const Space = () => {
                         <div className={`space_room_chat_card ${showChat ? "visible" : "hide"}`}>
                             <span className="space_room_chat_title">In-Room messages</span>
                             <div className="space_room_message_list">
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_right">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Nithin <span>10:22pm</span></span>
-                                    <span className="space_room_message_text">How are you ?</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
-                                <div className="space_room_message space_room_message_left">
-                                    {/* userId, message, time */}
-                                    <span className="space_room_chat_user">Vikas <span>10:20pm</span></span>
-                                    <span className="space_room_message_text">Hello</span>
-                                </div>
+                                {
+                                    roomMessages.map((message, i) => {
+                                        console.log({message, roomUsers});
+                                        return (
+                                            <div key={i} className={`space_room_message ${userId === message.userId ? "space_room_message_right" : "space_room_message_left"}`}>
+                                                <span className="space_room_chat_user">{roomUsers[message.userId].userName.slice(0, 7)} <span>{message.time}</span></span>
+                                                <span className="space_room_message_text">{message.text}</span>
+                                            </div>
+                                        )
+                                    }
+                                    )
+                                }
                             </div>
                             <div className="space_room_message_input">
-                                <input type="text" placeholder="Send messages here.." />
-                                <button className="space_room_send_btn">
+                                <input id="space_room_message_input" type="text" placeholder="Send messages here.." value={messageInput} onChange={(e) => {
+                                    setMessageInput(e.target.value);
+                                }} />
+                                <button className="space_room_send_btn"
+                                    onClick={() => {
+                                        sendMessage(messageInput);
+                                        setMessageInput("");
+                                    }}
+                                >
                                     <SendHorizonal size={17} />
                                 </button>
                             </div>

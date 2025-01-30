@@ -763,6 +763,7 @@ form input {
   font-size: 15px;
   word-wrap: break-word;
   color: #000000d1;
+  text-align: right;
 }
 
 .space_room_message_right {

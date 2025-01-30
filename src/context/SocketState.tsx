@@ -1,6 +1,6 @@
 import React from "react";
-import { SocketContext } from "./Contexts";
-import { OtherUsers, RoomUsers, StateProps } from "../types/StateTypes";
+import { SocketContext, useAppContext } from "./Contexts";
+import { OtherUsers, RoomChat, RoomUsers, StateProps } from "../types/StateTypes";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "./AppState";
 import { constants } from "../helpers/constants";
@@ -10,6 +10,9 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     const [joinedRoom, setJoinedRoom] = React.useState<boolean>(false);
     const [joinedSpace, setJoinedSpace] = React.useState<boolean>(false);
     const [roomUsers, setRoomUsers] = React.useState<RoomUsers>({});
+    const [roomMessages, setRoomMessages] = React.useState<RoomChat>([]);
+
+    const { userId } = useAppContext();
     var socketId = '';
 
     socket.on("connect", () => {
@@ -23,6 +26,30 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         console.log({ data });
     });
 
+    const newMessage = (data: { userId: string, text: string, time: string }) => {
+        setRoomMessages(prev => {
+            prev.push(data);
+            return [...prev];
+        });
+    }
+
+    const sendMessage = (text: string) => {
+        const time = new Date().toLocaleTimeString().split(" ");
+        console.log(text, time);
+        newMessage({ userId, text, time: time[0].slice(0, 5) + time[1] });
+        socket.emit(constants.client.message,
+            {
+                userId,
+                text,
+                spaceId: window.localStorage.getItem("spaceId") + constants.spaceRooms.room1,
+            });
+    }
+
+    socket.on(constants.server.message, (data: { userId: string, text: string, time: string }) => {
+        console.log("Message received", data);
+        const time = new Date().toLocaleTimeString().split(" ");
+        newMessage({ userId: data.userId, text: data.text, time: time[0].slice(0, 5) + time[1] });
+    });
 
     const getRandomColor = () => {
         return Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255);
@@ -69,7 +96,9 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             setJoinedRoom,
             joinedSpace,
             setJoinedSpace,
-            roomUsers
+            roomUsers,
+            sendMessage,
+            roomMessages
         }}>
             {children}
         </SocketContext.Provider>
