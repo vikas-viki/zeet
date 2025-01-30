@@ -41,14 +41,17 @@ const Space = () => {
 
             gameRef.current = new Phaser.Game(config);
 
-            document.addEventListener("reload", () => {
-                gameRef.current?.destroy(true);
-            });
-            document.addEventListener("resize", () => {
-                gameRef.current?.scale.resize(window.innerWidth, window.innerHeight);
-            })
-        }
+            const resizeHandler = () => gameRef.current?.scale.resize(window.innerWidth, window.innerHeight);
+            document.addEventListener("resize", resizeHandler);
+            document.addEventListener("reload", () => gameRef.current?.destroy(true));
 
+            return () => {
+                window.removeEventListener("resize", resizeHandler);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
         if (
             userId === '' ||
             userSpaces.length == 0
@@ -62,7 +65,7 @@ const Space = () => {
                 socket.emit(constants.client.joinSpace, { userId, spaceId: id, userName: userName.slice(0, 5) });
             }
         }
-    }, [joinedRoom, collidingJoin, userId, userSpaces]);
+    }, [userId, userSpaces, userName]);
 
     useEffect(() => {
         if (gameRef.current) {
