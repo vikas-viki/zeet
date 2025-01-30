@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameScene } from "./Phaser";
 import { eventBus } from "../helpers/EventBus";
 import { MessageSquareText, Mic, MicOff, PhoneCall, PhoneOff, SendHorizonal, Users, Video, VideoOff } from "lucide-react";
@@ -7,6 +7,7 @@ import { useAppContext, useSocketContext } from "../context/Contexts";
 import { useNavigate, useParams } from "react-router-dom";
 import { constants } from "../helpers/constants";
 import { socket } from "../context/SocketState";
+import MessageInput from "./MessageInput";
 
 const Space = () => {
     const gameRef = useRef<Phaser.Game | null>(null);
@@ -14,10 +15,9 @@ const Space = () => {
     const [collidingJoin, setcollidingJoin] = useState<boolean>(false);
     const [showRoomUsers, setShowRoomUsers] = useState<boolean>(false);
     const [showChat, setShowChat] = useState<boolean>(false);
-    const [messageInput, setMessageInput] = useState<string>("");
     const navigate = useNavigate();
 
-    const { micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, roomId, userSpaces, userName } = useAppContext();
+    const { micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
     const { joinedRoom, setJoinedRoom, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
 
@@ -65,16 +65,16 @@ const Space = () => {
     }, [joinedRoom, collidingJoin, userId, userSpaces]);
 
     useEffect(() => {
-        setTimeout(() => {
-            socket.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string } }[]) => {
-                console.log("other players location 1", data);
-                eventBus.emit(constants.server.playersLocation, data);
-            })
-            socket.emit(constants.client.reqLocation, { spaceId: id })
-        }, 2000);
-    }, [gameRef.current]);
+        if (gameRef.current) {
+            setTimeout(() => {
+                socket.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string } }[]) => {
+                    console.log("other players location 1", data);
+                    eventBus.emit(constants.server.playersLocation, data);
+                })
+                socket.emit(constants.client.reqLocation, { spaceId: id })
+            }, 1500);
+        }
 
-    useEffect(() => {
         eventBus.on(constants.events.collidingJoin, () => {
             console.log("User nearby ");
             if (!joinedRoom)
@@ -96,6 +96,38 @@ const Space = () => {
         };
     }, []);
 
+    const memorisedMessages = useMemo(() => {
+        return roomMessages.map((message, i) => {
+            console.log({ message, roomUsers });
+            return (
+                <div key={i} className={`space_room_message ${userName === message.userName ? "space_room_message_right" : "space_room_message_left"}`}>
+                    <span className="space_room_chat_user">{message.userName.slice(0, 7)} <span>{message.time}</span></span>
+                    <span className="space_room_message_text">{message.text}</span>
+                </div>
+            )
+        })
+    }, [roomMessages]);
+
+    const memorisedUsers = useMemo(() => {
+        return Object.values(roomUsers).map((user, i) => {
+            return (
+                <span key={i} title={user.userName} className="space_room_user" style={{ backgroundColor: `rgb(${user.color})` }}>{user.userName.slice(0, 1).toUpperCase()}</span>
+            )
+        })
+    }, [roomUsers]);
+
+    const joinCallHandler = useCallback(() => {
+        setJoinedRoom(true);
+        setcollidingJoin(false);
+        eventBus.emit(constants.events.joinedRoom, { spaceId: id, userName });
+    }, [userName, id]);
+
+    const leaveCallHandler = useCallback(() => {
+        setcollidingJoin(false);
+        setJoinedRoom(false);
+        eventBus.emit(constants.events.leftRoom, { spaceId: id, userName });
+    }, [userName, id]);
+
     return (
         <div className="space_main" >
             <div ref={gameContainerRef} className="game_container"></div>
@@ -103,11 +135,7 @@ const Space = () => {
                 {
                     collidingJoin === true &&
                     <button className="space_join_call"
-                        onClick={() => {
-                            setJoinedRoom(true);
-                            setcollidingJoin(false);
-                            eventBus.emit(constants.events.joinedRoom, { spaceId: id, userName });
-                        }}
+                        onClick={joinCallHandler}
                     > <PhoneCall /> <span>Join Stage</span>
                     </button>
                 }
@@ -140,11 +168,7 @@ const Space = () => {
                         </button>
                         <button className="space_leave_call"
                             id="space_leave_call"
-                            onClick={() => {
-                                setcollidingJoin(false);
-                                setJoinedRoom(false);
-                                eventBus.emit(constants.events.leftRoom, { spaceId: id, userName });
-                            }}
+                            onClick={leaveCallHandler}
                         > <PhoneOff /> <span>Leave Stage</span>
                         </button>
                         <button className="space_room_chat"
@@ -164,43 +188,14 @@ const Space = () => {
                         <div className={`space_room_chat_card ${showChat ? "visible" : "hide"}`}>
                             <span className="space_room_chat_title">In-Room messages</span>
                             <div className="space_room_message_list">
-                                {
-                                    roomMessages.map((message, i) => {
-                                        console.log({message, roomUsers});
-                                        return (
-                                            <div key={i} className={`space_room_message ${userId === message.userId ? "space_room_message_right" : "space_room_message_left"}`}>
-                                                <span className="space_room_chat_user">{roomUsers[message.userId].userName.slice(0, 7)} <span>{message.time}</span></span>
-                                                <span className="space_room_message_text">{message.text}</span>
-                                            </div>
-                                        )
-                                    }
-                                    )
-                                }
+                                {memorisedMessages}
                             </div>
-                            <div className="space_room_message_input">
-                                <input id="space_room_message_input" type="text" placeholder="Send messages here.." value={messageInput} onChange={(e) => {
-                                    setMessageInput(e.target.value);
-                                }} />
-                                <button className="space_room_send_btn"
-                                    onClick={() => {
-                                        sendMessage(messageInput);
-                                        setMessageInput("");
-                                    }}
-                                >
-                                    <SendHorizonal size={17} />
-                                </button>
-                            </div>
+                            <MessageInput sendMessage={sendMessage} />
                         </div>
                         <div className={`space_room_users_card ${showRoomUsers ? "visible" : "hide"}`} >
                             <span className="space_room_title">Room Users</span>
                             <div className="space_room_users_list">
-                                {
-                                    Object.values(roomUsers).map((user, i) => {
-                                        return (
-                                            <span key={i} title={user.userName} className="space_room_user" style={{ backgroundColor: `rgb(${user.color})` }}>{user.userName.slice(0, 1).toUpperCase()}</span>
-                                        )
-                                    })
-                                }
+                                {memorisedUsers}
                             </div>
                         </div>
                     </div>

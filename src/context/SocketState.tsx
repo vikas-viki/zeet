@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import { SocketContext, useAppContext } from "./Contexts";
 import { OtherUsers, RoomChat, RoomUsers, StateProps } from "../types/StateTypes";
 import { io } from "socket.io-client";
@@ -12,50 +12,46 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     const [roomUsers, setRoomUsers] = React.useState<RoomUsers>({});
     const [roomMessages, setRoomMessages] = React.useState<RoomChat>([]);
 
-    const { userId } = useAppContext();
+    const { userName } = useAppContext();
     var socketId = '';
-
-    socket.on("connect", () => {
-        console.log("Socket connected!");
-        socketId = socket.id || "";
-        document.title = socket.id!;
-    });
 
     socket.on(constants.server.userJoinedSpace, (data: any) => {
         console.log("User joined! space");
         console.log({ data });
     });
 
-    const newMessage = (data: { userId: string, text: string, time: string }) => {
+    const newMessage = useCallback((data: { userName: string, text: string, time: string }) => {
         setRoomMessages(prev => {
-            prev.push(data);
+            if (prev.filter(message => message.userName === data.userName && message.text === data.text && message.time === data.time).length === 0) {
+                prev.push(data);
+            }
             return [...prev];
         });
-    }
+    }, []);
 
-    const sendMessage = (text: string) => {
+    const sendMessage = useCallback((text: string) => {
         const time = new Date().toLocaleTimeString().split(" ");
         console.log(text, time);
-        newMessage({ userId, text, time: time[0].slice(0, 5) + time[1] });
+        newMessage({ userName, text, time: time[0].slice(0, 5) + time[1] });
         socket.emit(constants.client.message,
             {
-                userId,
+                userName,
                 text,
                 spaceId: window.localStorage.getItem("spaceId") + constants.spaceRooms.room1,
             });
-    }
+    }, [userName, newMessage]);
 
-    socket.on(constants.server.message, (data: { userId: string, text: string, time: string }) => {
+    const socket_newMessageHandler = useCallback((data: { userName: string, text: string, time: string }) => {
         console.log("Message received", data);
         const time = new Date().toLocaleTimeString().split(" ");
-        newMessage({ userId: data.userId, text: data.text, time: time[0].slice(0, 5) + time[1] });
-    });
+        newMessage({ userName: data.userName, text: data.text, time: time[0].slice(0, 5) + time[1] });
+    }, []);
 
-    const getRandomColor = () => {
+    const getRandomColor = useCallback(() => {
         return Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255) + "," + Math.floor(Math.random() * 255);
-    }
+    }, []);
 
-    socket.on(constants.server.userJoinedRoom, (data: { userId: string, roomId: string, userName: string }) => {
+    const socket_joinRoomHandler = useCallback((data: { userId: string, roomId: string, userName: string }) => {
         console.log("User joined room", data);
         setRoomUsers(prev => {
             prev[data.userId.toString()] = {
@@ -64,17 +60,17 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             };
             return { ...prev };
         })
-    })
+    }, []);
 
-    socket.on(constants.server.userLeftRoom, (data: { userId: string }) => {
+    const socket_leaveRoomHandler = useCallback((data: { userId: string }) => {
         console.log("User left room", data);
         setRoomUsers(prev => {
             delete prev[data.userId];
             return { ...prev };
         });
-    })
+    }, []);
 
-    socket.on(constants.server.roomUsers, (data: OtherUsers) => {
+    const socket_roomUsersHandler = useCallback((data: OtherUsers) => {
         console.log("Room users", data);
         setRoomUsers(prev => {
             for (let key in data) {
@@ -87,7 +83,32 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             }
             return { ...prev };
         })
-    })
+    }, []);
+
+    useEffect(() => {
+        socket.on(constants.server.message, socket_newMessageHandler);
+        socket.on(constants.server.userJoinedRoom, socket_joinRoomHandler);
+        socket.on(constants.server.userLeftRoom, socket_leaveRoomHandler);
+        socket.on(constants.server.roomUsers, socket_roomUsersHandler);
+
+        return () => {
+            socket.off(constants.server.message, socket_newMessageHandler);
+            socket.off(constants.server.userJoinedRoom, socket_joinRoomHandler);
+            socket.off(constants.server.userLeftRoom, socket_leaveRoomHandler);
+            socket.off(constants.server.roomUsers, socket_roomUsersHandler);
+        };
+    }, [socket_newMessageHandler, socket_joinRoomHandler, socket_leaveRoomHandler, socket_roomUsersHandler]);
+
+    useEffect(() => {
+        socket.on("connect", () => {
+            console.log("Socket connected!");
+            socketId = socket.id || "";
+            document.title = socket.id!;
+        });
+        return () => {
+            socket.off("connect");
+        }
+    }, [])
 
     return (
         <SocketContext.Provider value={{

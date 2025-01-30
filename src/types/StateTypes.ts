@@ -75,7 +75,7 @@ export type OtherUsers = {
 }
 
 export type RoomChat = {
-    userId: string;
+    userName: string;
     text: string;
     time: string;
 }[];
