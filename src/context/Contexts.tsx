@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { createContext, useContext, useRef } from "react";
 import { RoomChat, RoomUsers, UserSpaces } from "../types/StateTypes";
 
 interface AppState {
@@ -12,10 +12,7 @@ interface AppState {
     userSpaces: UserSpaces;
     deleteSpace: (_spaceId: string) => void;
     editSpace: (_spaceId: string, newSpaceName: string, toggleModel: CallableFunction) => void;
-    micOn: boolean;
-    setMicOn: (micOn: any) => void;
-    videoOn: boolean;
-    setVideoOn: (videoOn: any) => void;
+   
     setRoomId: (roomId: string) => void;
     roomId: string;
     updateNickName: (newName: string) => void;
@@ -46,7 +43,11 @@ interface SocketState {
     setJoinedSpace: (joined: boolean) => void;
     roomUsers: RoomUsers;
     sendMessage: (text: string) => void;
-    roomMessages: RoomChat
+    roomMessages: RoomChat;
+    micOn: boolean;
+    setMicOn: (micOn: any) => void;
+    videoOn: boolean;
+    setVideoOn: (videoOn: any) => void;
 };
 
 export const SocketContext = createContext<SocketState | undefined>(undefined);

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { SocketContext, useAppContext } from "./Contexts";
 import { OtherUsers, RoomChat, RoomUsers, StateProps } from "../types/StateTypes";
 import { io } from "socket.io-client";
@@ -11,6 +11,8 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     const [joinedSpace, setJoinedSpace] = React.useState<boolean>(false);
     const [roomUsers, setRoomUsers] = React.useState<RoomUsers>({});
     const [roomMessages, setRoomMessages] = React.useState<RoomChat>([]);
+    const [micOn, setMicOn] = React.useState<boolean>(false);
+    const [videoOn, setVideoOn] = React.useState<boolean>(false);
 
     const { userName } = useAppContext();
     var socketId = '';
@@ -90,6 +92,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         socket.on(constants.server.userJoinedRoom, socket_joinRoomHandler);
         socket.on(constants.server.userLeftRoom, socket_leaveRoomHandler);
         socket.on(constants.server.roomUsers, socket_roomUsersHandler);
+        // webRTC handling
 
         return () => {
             socket.off(constants.server.message, socket_newMessageHandler);
@@ -119,7 +122,11 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             setJoinedSpace,
             roomUsers,
             sendMessage,
-            roomMessages
+            roomMessages,
+            micOn,
+            setMicOn,
+            videoOn,
+            setVideoOn
         }}>
             {children}
         </SocketContext.Provider>

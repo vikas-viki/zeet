@@ -19,6 +19,11 @@ export const constants = {
         roomUsers: "2.7",
         message: "2.8"
     },
+    webRTC: {
+        offer: "3.1",
+        answer: "3.2",
+        candidate: "3.3"
+    },
     events: {
         collidingJoin: "3.1",
         collidingLeave: "3.2",

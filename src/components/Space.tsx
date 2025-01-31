@@ -16,10 +16,13 @@ const Space = () => {
     const [showRoomUsers, setShowRoomUsers] = useState<boolean>(false);
     const [showChat, setShowChat] = useState<boolean>(false);
     const navigate = useNavigate();
+    const peerRef = useRef<RTCPeerConnection>(new RTCPeerConnection({
+        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
+    }));
 
-    const { micOn, setMicOn, videoOn, setVideoOn, setRoomId, userId, userSpaces, userName } = useAppContext();
+    const { setRoomId, userId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
-    const { joinedRoom, setJoinedRoom, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
+    const { joinedRoom, setJoinedRoom, micOn, setMicOn, videoOn, setVideoOn, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
 
 
     useEffect(() => {
@@ -119,10 +122,11 @@ const Space = () => {
         })
     }, [roomUsers]);
 
-    const joinCallHandler = useCallback(() => {
+    const joinCallHandler = useCallback(async () => {
         setJoinedRoom(true);
         setcollidingJoin(false);
         eventBus.emit(constants.events.joinedRoom, { spaceId: id, userName });
+
     }, [userName, id]);
 
     const leaveCallHandler = useCallback(() => {

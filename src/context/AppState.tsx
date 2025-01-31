@@ -19,8 +19,6 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const [userName, setUserName] = React.useState<string>('');
     const [userSpaces, setUserSpaces] = React.useState<UserSpaces>([]);
     const [spaces, setSpaces] = React.useState<Spaces>([]);
-    const [micOn, setMicOn] = React.useState<boolean>(false);
-    const [videoOn, setVideoOn] = React.useState<boolean>(false);
     const [roomId, setRoomId] = React.useState<string>('');
 
     const navigate = useNavigate();
@@ -237,10 +235,6 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             userSpaces,
             deleteSpace,
             editSpace,
-            micOn,
-            setMicOn,
-            videoOn,
-            setVideoOn,
             setRoomId,
             roomId,
             updateNickName,
