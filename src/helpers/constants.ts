@@ -24,6 +24,14 @@ export const constants = {
         answer: "3.2",
         candidate: "3.3"
     },
+    mediaSoup: {
+        createTransport: "4.1",
+        connectTransport: "4.2",
+        produce: "4.3",
+        consume: "4.4",
+        resumeConsume: "4.5",
+        pauseProducing: "4.6"
+    },
     events: {
         collidingJoin: "3.1",
         collidingLeave: "3.2",

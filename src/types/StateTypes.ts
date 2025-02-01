@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { types } from "mediasoup-client";
 
 export interface StateProps {
     children: ReactNode;
@@ -79,3 +80,17 @@ export type RoomChat = {
     text: string;
     time: string;
 }[];
+
+export type ProducerTransport = {
+    audio: types.Transport | null;
+    video: types.Transport | null;
+};
+export type ConsumerTransport = {
+    audios: types.Transport[];
+    videos: types.Transport[];
+};
+
+export type ConsumerStreams = {
+    audios: MediaStream[];
+    videos: MediaStream[];
+};
