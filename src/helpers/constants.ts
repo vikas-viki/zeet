@@ -30,7 +30,10 @@ export const constants = {
         produce: "4.3",
         consume: "4.4",
         resumeConsume: "4.5",
-        pauseProducing: "4.6"
+        pauseProducing: "4.6",
+        getRouterRtpCapabilities: "4.7",
+        userProducing: "4.8",
+        userPausing: "4.9",
     },
     events: {
         collidingJoin: "3.1",

@@ -656,6 +656,50 @@ form input {
   display: block;
 }
 
+.space_room_user_container {
+  /* position: absolute; */
+}
+
+.space_room_user_controls {
+  position: relative;
+  top: -15px;
+  width: 100%;
+  /* background-color: rgb(31, 183, 191); */
+  display: flex;
+  justify-content: space-around;
+}
+
+.space_room_user_controls svg {
+  padding: 3px;
+  cursor: pointer;
+}
+
+.icon_on {
+  background-color: #1e7e34;
+}
+
+.icon_on:hover {
+  background-color: #218838;
+}
+
+.icon_off {
+  background-color: #7e1e1e;
+}
+
+.icon_off:hover {
+  background-color: #882121;
+}
+
+.border-left {
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.border-right {
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 .space_room_chat {
   position: absolute;
   right: 130px;

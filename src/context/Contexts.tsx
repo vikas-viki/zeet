@@ -12,7 +12,7 @@ interface AppState {
     userSpaces: UserSpaces;
     deleteSpace: (_spaceId: string) => void;
     editSpace: (_spaceId: string, newSpaceName: string, toggleModel: CallableFunction) => void;
-   
+
     setRoomId: (roomId: string) => void;
     roomId: string;
     updateNickName: (newName: string) => void;
@@ -48,6 +48,10 @@ interface SocketState {
     setMicOn: (micOn: any) => void;
     videoOn: boolean;
     setVideoOn: (videoOn: any) => void;
+    startProducingMedia: (kind: "audio" | "video") => Promise<void>;
+    stopProducingMedia: (kind: "audio" | "video") => void;
+    startConsumingMedia: (producerId: string, produceUserId: string) => void;
+    stopConsumingMedia: (produceUserId: string, kind: "audio" | "video") => void;
 };
 
 export const SocketContext = createContext<SocketState | undefined>(undefined);

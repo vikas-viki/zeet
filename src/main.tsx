@@ -8,15 +8,13 @@ import { Toaster } from 'react-hot-toast';
 import SocketState from './context/SocketState.tsx'
 
 createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <BrowserRouter >
-      <AppState>
-        <SocketState>
+  <BrowserRouter >
+    <AppState>
+      <SocketState>
 
         <App />
         <Toaster position='top-right' />
-        </SocketState>
-      </AppState>
-    </BrowserRouter>
-  </StrictMode>,
+      </SocketState>
+    </AppState>
+  </BrowserRouter>
 )

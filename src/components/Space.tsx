@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { constants } from "../helpers/constants";
 import { socket } from "../context/SocketState";
 import MessageInput from "./MessageInput";
+import User from "./User";
 
 const Space = () => {
     const gameRef = useRef<Phaser.Game | null>(null);
@@ -22,7 +23,7 @@ const Space = () => {
 
     const { setRoomId, userId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
-    const { joinedRoom, setJoinedRoom, micOn, setMicOn, videoOn, setVideoOn, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
+    const { startProducingMedia, stopProducingMedia, joinedRoom, setJoinedRoom, micOn, setMicOn, videoOn, setVideoOn, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
 
 
     useEffect(() => {
@@ -117,7 +118,7 @@ const Space = () => {
     const memorisedUsers = useMemo(() => {
         return Object.values(roomUsers).map((user, i) => {
             return (
-                <span key={i} title={user.userName} className="space_room_user" style={{ backgroundColor: `rgb(${user.color})` }}>{user.userName.slice(0, 1).toUpperCase()}</span>
+                <User  {...user} key={i} />
             )
         })
     }, [roomUsers]);
@@ -150,8 +151,13 @@ const Space = () => {
                     joinedRoom === true &&
                     <div className="space_joined_options">
                         <button className={`space_mic ${micOn ? "mic_on" : "mic_off"}`}
-                            onClick={() => {
+                            onClick={async () => {
                                 setMicOn((prev: any) => !prev);
+                                if (!micOn) {
+                                    await startProducingMedia("audio");
+                                } else {
+                                    stopProducingMedia("audio");
+                                }
                             }}
                         >
                             {
@@ -163,7 +169,14 @@ const Space = () => {
                         </button>
                         <button className={`space_video ${videoOn ? "vid_on" : "vid_off"}`}
                             onClick={() => {
-                                setVideoOn((prev: any) => !prev);
+                                setVideoOn((prev: any) => {
+                                    if (!prev) {
+                                        startProducingMedia("video");
+                                    } else {
+                                        stopProducingMedia("video");
+                                    }
+                                    return !prev
+                                });
                             }}
                         >
                             {
@@ -208,7 +221,7 @@ const Space = () => {
                     </div>
                 }
             </div>
-        </div>
+        </div >
     );
 };
 

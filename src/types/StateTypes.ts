@@ -64,10 +64,23 @@ export type Spaces = {
     map: any;
 }[];
 
+export type RoomUser = {
+    userName: string;
+    color: string;
+    audioProducerId: string | null;
+    videoProducerId: string | null;
+    audioPaused: boolean;
+    videoPaused: boolean;
+};
+
 export type RoomUsers = {
     [userId: string]: {
         userName: string;
         color: string;
+        audioProducerId: string | null;
+        audioPaused: boolean;
+        videoPaused: boolean;
+        videoProducerId: string | null;
     }
 };
 
@@ -91,6 +104,8 @@ export type ConsumerTransport = {
 };
 
 export type ConsumerStreams = {
-    audios: MediaStream[];
-    videos: MediaStream[];
+    [userId: string]: {
+        audio: MediaStream | null;
+        video: MediaStream | null;
+    }
 };
