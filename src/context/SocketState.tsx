@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { SocketContext, useAppContext } from "./Contexts";
-import { ConsumerStreams, ConsumerTransport, OtherUsers, ProducerTransport, RoomChat, RoomUsers, StateProps } from "../types/StateTypes";
+import { Consumers, ConsumerStreams, ConsumerTransport, OtherUsers, ProducerTransport, RoomChat, RoomUsers, StateProps } from "../types/StateTypes";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "./AppState";
 import { constants } from "../helpers/constants";
@@ -16,10 +16,11 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     const [roomMessages, setRoomMessages] = React.useState<RoomChat>([]);
     const [micOn, setMicOn] = React.useState<boolean>(false);
     const [videoOn, setVideoOn] = React.useState<boolean>(false);
-    const [producerTransport, setProducerTransport] = React.useState<mediaSoupClient.types.Transport | null>(null);
-    const [audioProducer, setAudioProducer] = React.useState<mediaSoupClient.types.Producer | null>(null);
-    const [videoProducer, setVideoProducer] = React.useState<mediaSoupClient.types.Producer | null>(null);
-    const [consumerTransport, setConsumerTransport] = React.useState<mediaSoupClient.types.Transport | null>(null);
+    const audioProducer = React.useRef<mediaSoupClient.types.Producer | null>(null);
+    const videoProducer = React.useRef<mediaSoupClient.types.Producer | null>(null);
+    const consumers = React.useRef<Consumers>({});
+    const producerTransport = React.useRef<mediaSoupClient.types.Transport | null>(null);
+    const consumerTransport = React.useRef<mediaSoupClient.types.Transport | null>(null);
     const [consumerStreams, setConsumerStreams] = React.useState<ConsumerStreams>({});
     const [mediaSoupDevice, setMediaSoupDevice] = React.useState<mediaSoupClient.Device>(new mediaSoupClient.Device());
     const [localStream, setLocalStream] = React.useState<MediaStream | null>(null);
@@ -66,14 +67,15 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     const socket_joinRoomHandler = useCallback((data: { userId: string, roomId: string, userName: string }) => {
         console.log("User joined room", data);
         setRoomUsers(prev => {
-            prev[data.userId.toString()] = {
-                userName: data.userName,
-                color: getRandomColor(),
-                audioProducerId: null,
-                videoProducerId: null,
-                audioPaused: true,
-                videoPaused: true
-            };
+            if (data.userId.toString() !== "")
+                prev[data.userId.toString()] = {
+                    userName: data.userName,
+                    color: getRandomColor(),
+                    audioProducerId: null,
+                    videoProducerId: null,
+                    audioPaused: true,
+                    videoPaused: true
+                };
             return { ...prev };
         })
     }, []);
@@ -90,7 +92,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         console.log("Room users", data);
         setRoomUsers(prev => {
             for (let key in data) {
-                if (!prev[key]) {
+                if (!prev[key] && key !== "") {
                     prev[key] = {
                         userName: data[key],
                         color: getRandomColor(),
@@ -130,6 +132,8 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         socket.on(constants.mediaSoup.userProducing, (data: { userId: string, kind: "audio" | "video", producerId: string }) => {
             console.log("producing", data);
 
+            startConsumingMedia(data.producerId, data.userId);
+
             setRoomUsers(prev => {
                 prev[data.userId] = {
                     ...prev[data.userId],
@@ -140,7 +144,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             });
         })
 
-        socket.on(constants.mediaSoup.userPausing, (data: { userId: string, kind: "audio" | "video" }) => {
+        socket.on(constants.mediaSoup.userPauseProducing, (data: { userId: string, kind: "audio" | "video" }) => {
             console.log("stopping", data);
 
             setRoomUsers(prev => {
@@ -156,26 +160,29 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         }
     }, []);
 
+    const loadMediaSoupDevice = useCallback(async () => {
+        if (!mediaSoupDevice.loaded) {
+            console.log("Loading mediaSoupDevice...");
+            await new Promise<void>((resolve) => {
+                socket.emit(constants.mediaSoup.getRouterRtpCapabilities, {}, async (rtpCapabilities: RtpCapabilities) => {
+                    await mediaSoupDevice.load({ routerRtpCapabilities: rtpCapabilities });
+                    console.log("mediaSoupDevice loaded successfully.");
+                    resolve();
+                });
+            });
+        }
+    }, [mediaSoupDevice]);
+
     const startProducingMedia = useCallback(async (kind: "audio" | "video") => {
         try {
             if (!mediaSoupDevice) return;
-            if (!mediaSoupDevice.loaded) {
-                console.log("Loading mediaSoupDevice...");
-                await new Promise<void>((resolve) => {
-                    socket.emit(constants.mediaSoup.getRouterRtpCapabilities, {}, async (rtpCapabilities: RtpCapabilities) => {
-                        await mediaSoupDevice.load({ routerRtpCapabilities: rtpCapabilities });
-                        console.log("mediaSoupDevice loaded successfully.");
-                        resolve();
-                    });
-                });
-            }
+            await loadMediaSoupDevice();
             const roomId = window.localStorage.getItem("spaceId") + constants.spaceRooms.room1;
             const constraints = kind === "audio" ? { audio: true } : { video: true };
             const stream = await navigator.mediaDevices.getUserMedia(constraints);
             setLocalStream(stream);
 
-            let _producerTransport = producerTransport;
-            let producerId: string = "";
+            let _producerTransport = producerTransport.current;
 
             if (!_producerTransport) {
                 _producerTransport = await new Promise((resolve) => {
@@ -184,7 +191,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                         (transportInfo: mediaSoupClient.types.TransportOptions) => {
                             console.log({ mediaSoupDevice });
                             const transport = mediaSoupDevice.createSendTransport(transportInfo);
-                            setProducerTransport(transport);
+                            producerTransport.current = transport;
 
                             transport.on("connect", ({ dtlsParameters }, callback) => {
                                 socket.emit(constants.mediaSoup.connectTransport, {
@@ -216,12 +223,13 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                 return;
             }
 
-            let producer = kind === "audio" ? audioProducer : videoProducer;
+            let producer = kind === "audio" ? audioProducer.current : videoProducer.current;
+            let producerId: any;
 
             if (producer) {
                 console.log(`Resuming ${kind} producer`);
                 producer.resume();
-
+                producerId = producer.id;
                 await producer.replaceTrack({ track: stream.getTracks()[0] });
 
                 console.log(`${kind} track stopped`);
@@ -234,8 +242,9 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                     disableTrackOnPause: kind === "audio",
                 }).then(producer => {
                     console.log("creating ", { producer });
-                    if (kind === "audio") setAudioProducer(producer);
-                    else setVideoProducer(producer);
+                    producerId = producer.id;
+                    if (kind === "audio") audioProducer.current = producer;
+                    else videoProducer.current = producer;
                 }).catch(console.log)
             }
 
@@ -247,7 +256,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     }, [userId, mediaSoupDevice, producerTransport, audioProducer, videoProducer]);
 
     const stopProducingMedia = useCallback(async (kind: "audio" | "video") => {
-        const producer = kind === "audio" ? audioProducer : videoProducer;
+        const producer = kind === "audio" ? audioProducer.current : videoProducer.current;
 
         if (producer) {
             producer.pause();
@@ -255,40 +264,85 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
 
             await producer.replaceTrack({ track: null });
 
-            socket.emit(constants.mediaSoup.userPausing, { userId, kind, roomId: window.localStorage.getItem("spaceId") + constants.spaceRooms.room1 });
+            socket.emit(constants.mediaSoup.userPauseProducing, { userId, roomId: window.localStorage.getItem("spaceId") + constants.spaceRooms.room1, kind, producerId: producer.id });
         } else {
             console.error("Producer does not exist!");
         }
-    }, [audioProducer, videoProducer]);
+    }, [audioProducer, videoProducer, userId]);
 
-    const startConsumingMedia = useCallback((producerId: string, produceUserId: string) => {
+    const startConsumingMedia = useCallback(async (producerId: string, produceUserId: string) => {
         const roomId = window.localStorage.getItem("spaceId") + constants.spaceRooms.room1;
-        socket.emit(constants.mediaSoup.createTransport, { userId, produce: false, roomId }, async (transportInfo: any) => {
-            var transport = consumerTransport;
-            if (!transport) {
-                transport = mediaSoupDevice!.createRecvTransport(transportInfo);
-                setConsumerTransport(transport);
-            }
 
-            transport.on("connect", (args: { dtlsParameters: DtlsParameters }, callback: CallableFunction) => {
-                socket.emit(constants.mediaSoup.connectTransport, { dtlsParameters: args.dtlsParameters, userId, produce: false, roomId }, callback);
-            });
+        if (!mediaSoupDevice) return;
+        await loadMediaSoupDevice();
 
-            socket.emit(constants.mediaSoup.consume, { rtpCapabilities: mediaSoupDevice?.rtpCapabilities, producerId, userId, roomId }, async (consumerInfo: { id: string, kind: "audio" | "video", rtpParameters: RtpParameters }) => {
-                const consumer = await transport!.consume(consumerInfo);
-                consumer.resume();
-                setConsumerStreams(prev => {
-                    const newStream = new MediaStream();
-                    newStream.addTrack(consumer.track);
-                    prev[produceUserId] = {
-                        ...prev[produceUserId],
-                        [consumerInfo.kind]: newStream
-                    };
-                    return { ...prev }
+        let _consumerTransport = consumerTransport.current;
+
+        console.log("start consuming", { _consumerTransport });
+
+        if (!_consumerTransport) {
+            console.log("creating transport!");
+            _consumerTransport = await new Promise((resolve) => {
+                socket.emit(constants.mediaSoup.createTransport, { userId, produce: false, roomId }, async (transportInfo: any) => {
+                    let transport = mediaSoupDevice!.createRecvTransport(transportInfo);
+                    console.log("consume transport created!", transport);
+                    consumerTransport.current = transport;
+
+                    transport.on("connect", (args: { dtlsParameters: DtlsParameters }, callback: CallableFunction) => {
+                        socket.emit(constants.mediaSoup.connectTransport, { dtlsParameters: args.dtlsParameters, userId, produce: false, roomId }, callback);
+                    });
+
+                    resolve(transport);
                 })
             })
+        }
+
+        console.log("already created transport info: ", consumerTransport);
+        var consumerId = consumers.current[producerId]?.id || "-";
+
+        socket.emit(constants.mediaSoup.consume, { rtpCapabilities: mediaSoupDevice?.rtpCapabilities, producerId, userId, roomId, consumerId }, async (consumerInfo: { id: string, kind: "audio" | "video", rtpParameters: RtpParameters, producerId: string }) => {
+            var _consumer = consumers.current[producerId];
+            const newStream = new MediaStream();
+            if (!_consumer) {
+                _consumer = await _consumerTransport!.consume(consumerInfo);
+                consumers.current[producerId] = _consumer;
+                newStream.addTrack(_consumer.track);
+
+                console.log("consuming: ", { consumerInfo }, _consumer.track);
+
+                if (consumerInfo.kind === "video") {
+                    const videoElement = document.createElement("video");
+                    videoElement.id = _consumer.id;
+                    videoElement.srcObject = newStream;
+                    videoElement.autoplay = true;
+                    videoElement.controls = true;
+                    videoElement.playsInline = true;
+                    document.body.appendChild(videoElement);
+                    await videoElement.play();
+                } else if (consumerInfo.kind === "audio") {
+                    const audioElement = new Audio();
+                    audioElement.id = _consumer.id;
+                    // audioElement.style.display = "none";
+                    audioElement.controls = true; // Debugging: Add controls to see if it's playing
+                    audioElement.srcObject = newStream;
+                    audioElement.autoplay = true;
+                    document.body.appendChild(audioElement);
+                    await audioElement.play();
+                }
+            } else {
+                _consumer.resume();
+                (document.getElementById(_consumer.id) as HTMLMediaElement)?.play();
+            }
+
+            setConsumerStreams(prev => {
+                prev[produceUserId] = {
+                    ...prev[produceUserId],
+                    [consumerInfo.kind]: newStream
+                };
+                return { ...prev }
+            })
         })
-    }, [consumerTransport, mediaSoupDevice, userId]);
+    }, [consumerTransport, mediaSoupDevice, userId, consumerStreams]);
 
     const stopConsumingMedia = useCallback((produceUserId: string, kind: "audio" | "video") => {
         if (!consumerStreams[produceUserId]) return;

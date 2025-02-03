@@ -109,3 +109,7 @@ export type ConsumerStreams = {
         video: MediaStream | null;
     }
 };
+
+export type Consumers ={
+    [producerId: string]: types.Consumer;
+}

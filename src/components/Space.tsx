@@ -116,6 +116,7 @@ const Space = () => {
     }, [roomMessages]);
 
     const memorisedUsers = useMemo(() => {
+        console.log({ roomUsers });
         return Object.values(roomUsers).map((user, i) => {
             return (
                 <User  {...user} key={i} />
