@@ -669,6 +669,46 @@ form input {
   justify-content: space-around;
 }
 
+.space_mic_options,
+.space_video_options {
+  position: absolute;
+  width: 200px;
+  bottom: 75px;
+  background-color: rgb(123, 123, 123);
+  padding: 8px 0px;
+  border-radius: 8px;
+}
+
+.options_on {
+  display: block;
+}
+
+.options_off {
+  display: none;
+}
+
+.space_mic_options button,
+.space_video_options button {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding: 10px;
+  width: 100%;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: "Poppins";
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: background-color 0.2s ease;
+}
+
+.space_mic_options button:hover {
+  background-color: #6c6c6c;
+}
+
 .space_room_user_controls svg {
   padding: 3px;
   cursor: pointer;

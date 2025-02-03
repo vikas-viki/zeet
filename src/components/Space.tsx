@@ -9,6 +9,7 @@ import { constants } from "../helpers/constants";
 import { socket } from "../context/SocketState";
 import MessageInput from "./MessageInput";
 import User from "./User";
+import toast from "react-hot-toast";
 
 const Space = () => {
     const gameRef = useRef<Phaser.Game | null>(null);
@@ -16,7 +17,10 @@ const Space = () => {
     const [collidingJoin, setcollidingJoin] = useState<boolean>(false);
     const [showRoomUsers, setShowRoomUsers] = useState<boolean>(false);
     const [showChat, setShowChat] = useState<boolean>(false);
+    const mediaDevices = useRef<MediaDeviceInfo[]>([]);
     const navigate = useNavigate();
+    const [showMicOptions, setShowMicOptions] = useState<boolean>(false);
+    const [showCameraOptions, setShowCameraOptions] = useState<boolean>(false);
     const peerRef = useRef<RTCPeerConnection>(new RTCPeerConnection({
         iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
     }));
@@ -98,6 +102,10 @@ const Space = () => {
             socket.emit(constants.client.leaveSpace, { userId, spaceId: id });
         });
 
+        navigator.mediaDevices.enumerateDevices().then((_devices) => {
+            mediaDevices.current = _devices;
+        });
+
         return () => {
             socket.emit(constants.client.leaveSpace, { userId, spaceId: id });
         };
@@ -137,6 +145,78 @@ const Space = () => {
         eventBus.emit(constants.events.leftRoom, { spaceId: id, userName });
     }, [userName, id]);
 
+    const micOnHandler = useCallback(async () => {
+        if (!micOn) {
+            toast.loading("Select an input device", {
+                duration: 2000
+            });
+            setShowMicOptions(true);
+        } else {
+            stopProducingMedia("audio");
+            setMicOn(false);
+        }
+    }, [micOn]);
+
+    const cameraOnHandler = useCallback(async () => {
+        if (!videoOn) {
+            toast.loading("Select an input device", {
+                duration: 2000
+            });
+            setShowCameraOptions(true);
+        } else {
+            stopProducingMedia("video");
+            setVideoOn(false);
+        }
+    }, [videoOn]);
+
+    const selectDeviceHandler = useCallback((deviceId: string, mic: boolean) => {
+        if (mic && !micOn) {
+            startProducingMedia("audio", deviceId).then(() => {
+                setMicOn(true);
+                setShowMicOptions(false);
+            })
+        } else if (!mic && !videoOn) {
+            startProducingMedia("video", deviceId).then(() => {
+                setVideoOn(true);
+                setShowCameraOptions(false);
+            })
+        }
+    }, [micOn]);
+
+    const micOptions = () => {
+        const devices = mediaDevices.current.filter(device => device.kind === "audioinput");
+
+        return (
+            <div className={`space_mic_options ${showMicOptions ? "options_on" : "options_off"}`}>
+                {
+                    devices.map((device, i) => {
+                        return (
+                            <button title={device.label} key={i} onClick={() => selectDeviceHandler(device.deviceId, true)}>{
+                                device.label.slice(0, 20) + (device.label.length > 20 ? "..." : "")}</button>
+                        )
+                    })
+                }
+            </div>
+        )
+    }
+
+    const cameraOptions = () => {
+        const devices = mediaDevices.current.filter(device => device.kind === "videoinput");
+
+        return (
+            <div className={`space_video_options ${showCameraOptions ? "options_on" : "options_off"}`}>
+                {
+                    devices.map((device, i) => {
+                        return (
+                            <button title={device.label} key={i} onClick={() => selectDeviceHandler(device.deviceId, false)}>{
+                                device.label.slice(0, 20) + (device.label.length > 20 ? "..." : "")}</button>
+                        )
+                    })
+                }
+            </div>
+        )
+    }
+
     return (
         <div className="space_main" >
             <div ref={gameContainerRef} className="game_container"></div>
@@ -151,42 +231,32 @@ const Space = () => {
                 {
                     joinedRoom === true &&
                     <div className="space_joined_options">
-                        <button className={`space_mic ${micOn ? "mic_on" : "mic_off"}`}
-                            onClick={async () => {
-                                setMicOn((prev: any) => !prev);
-                                if (!micOn) {
-                                    await startProducingMedia("audio");
-                                } else {
-                                    stopProducingMedia("audio");
+                        <div className="space_mic_btn">
+                            {micOptions()}
+                            <button className={`space_mic ${micOn ? "mic_on" : "mic_off"}`}
+                                onClick={micOnHandler}
+                            >
+                                {
+                                    micOn ?
+                                        <Mic />
+                                        :
+                                        <MicOff />
                                 }
-                            }}
-                        >
-                            {
-                                micOn ?
-                                    <Mic />
-                                    :
-                                    <MicOff />
-                            }
-                        </button>
-                        <button className={`space_video ${videoOn ? "vid_on" : "vid_off"}`}
-                            onClick={() => {
-                                setVideoOn((prev: any) => {
-                                    if (!prev) {
-                                        startProducingMedia("video");
-                                    } else {
-                                        stopProducingMedia("video");
-                                    }
-                                    return !prev
-                                });
-                            }}
-                        >
-                            {
-                                videoOn ?
-                                    <Video />
-                                    :
-                                    <VideoOff />
-                            }
-                        </button>
+                            </button>
+                        </div>
+                        <div className="space_camera_btn">
+                            {cameraOptions()}
+                            <button className={`space_video ${videoOn ? "vid_on" : "vid_off"}`}
+                                onClick={cameraOnHandler}
+                            >
+                                {
+                                    videoOn ?
+                                        <Video />
+                                        :
+                                        <VideoOff />
+                                }
+                            </button>
+                        </div>
                         <button className="space_leave_call"
                             id="space_leave_call"
                             onClick={leaveCallHandler}

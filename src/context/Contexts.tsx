@@ -48,7 +48,7 @@ interface SocketState {
     setMicOn: (micOn: any) => void;
     videoOn: boolean;
     setVideoOn: (videoOn: any) => void;
-    startProducingMedia: (kind: "audio" | "video") => Promise<void>;
+    startProducingMedia: (kind: "audio" | "video", deviceId: string) => Promise<void>;
     stopProducingMedia: (kind: "audio" | "video") => void;
     startConsumingMedia: (producerId: string, produceUserId: string) => void;
     stopConsumingMedia: (produceUserId: string, kind: "audio" | "video") => void;

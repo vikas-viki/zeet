@@ -113,3 +113,8 @@ export type ConsumerStreams = {
 export type Consumers ={
     [producerId: string]: types.Consumer;
 }
+
+export type DeviceSelectorProps = {
+    selectDevice: CallableFunction;
+    devices: MediaDeviceInfo[];
+}
