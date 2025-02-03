@@ -178,6 +178,8 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             if (!mediaSoupDevice) return;
             await loadMediaSoupDevice();
             const roomId = window.localStorage.getItem("spaceId") + constants.spaceRooms.room1;
+            const constraints = kind === "audio" ? { audio: true } : { video: true };
+            await navigator.mediaDevices.getUserMedia(constraints);
             const stream = await navigator.mediaDevices.getUserMedia({
                 [kind]: { deviceId: { exact: deviceId } }
             });

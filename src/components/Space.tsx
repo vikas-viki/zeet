@@ -102,8 +102,19 @@ const Space = () => {
             socket.emit(constants.client.leaveSpace, { userId, spaceId: id });
         });
 
-        navigator.mediaDevices.enumerateDevices().then((_devices) => {
-            mediaDevices.current = _devices;
+        navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+            },
+            video: true,
+        }).then(stream => {
+            stream.getTracks().forEach(track => track.stop());
+
+            navigator.mediaDevices.enumerateDevices().then((_devices) => {
+                mediaDevices.current = _devices;
+            });
         });
 
         return () => {
