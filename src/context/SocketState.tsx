@@ -303,7 +303,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         console.log("already created transport info: ", consumerTransport);
         var consumerId = consumers.current[producerId]?.id || "-";
 
-        socket.emit(constants.mediaSoup.consume, { rtpCapabilities: mediaSoupDevice?.rtpCapabilities, producerId, userId, roomId, consumerId }, async (consumerInfo: { id: string, kind: "audio" | "video", rtpParameters: RtpParameters, producerId: string }) => {
+        socket.emit(constants.mediaSoup.consume, { rtpCapabilities: mediaSoupDevice?.rtpCapabilities, producerId, userId, roomId, consumerId, produceUserId }, async (consumerInfo: { id: string, kind: "audio" | "video", rtpParameters: RtpParameters, producerId: string }, userName: string) => {
             var _consumer = consumers.current[producerId];
             const newStream = new MediaStream();
             if (!_consumer) {
@@ -314,13 +314,12 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                 console.log("consuming: ", { consumerInfo }, _consumer.track);
 
                 if (consumerInfo.kind === "video") {
-                    const videoElement = document.createElement("video");
-                    videoElement.id = _consumer.id;
+                    console.log(userName + "_video");
+                    const videoElement = document.getElementById(userName + "_video") as HTMLVideoElement;
                     videoElement.srcObject = newStream;
                     videoElement.autoplay = true;
-                    videoElement.controls = true;
+                    videoElement.controls = false;
                     videoElement.playsInline = true;
-                    document.body.appendChild(videoElement);
                     await videoElement.play();
                 } else if (consumerInfo.kind === "audio") {
                     const audioElement = new Audio();

@@ -21,9 +21,6 @@ const Space = () => {
     const navigate = useNavigate();
     const [showMicOptions, setShowMicOptions] = useState<boolean>(false);
     const [showCameraOptions, setShowCameraOptions] = useState<boolean>(false);
-    const peerRef = useRef<RTCPeerConnection>(new RTCPeerConnection({
-        iceServers: [{ urls: "stun:stun.l.google.com:19302" }]
-    }));
 
     const { setRoomId, userId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
