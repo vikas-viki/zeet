@@ -667,12 +667,42 @@ form input {
   display: flex;
   justify-content: center;
   flex-direction: column;
-  gap:5px;
-  /* overflow: hidden ; */
+  gap: 5px;
 }
 
-.room_user_bg{
+.room_user_bg {
   background-color: rgba(128, 128, 128, 0.815);
+}
+
+.user_video_full_screen {
+  stroke: white;
+  stroke-width: 2px;
+  position: absolute;
+  background-color: rgba(128, 128, 128, 0.836);
+  z-index: 11;
+  border-radius: 7px;
+  width: 0px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  width: 130px;
+  scale: 0;
+  padding: 17px 0px;
+}
+
+#root .full_screen {
+  z-index: 10002;
+  position: fixed!important;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50vw;
+  height: 25vh;
+border-radius: 8px;
+}
+
+.space_room_user_container:hover .user_video_full_screen {
+  scale: 1.1;
+  padding: 26px 2px;
 }
 
 .space_room_user_controls {
@@ -682,10 +712,13 @@ form input {
   justify-content: space-around;
   height: 0px;
   position: relative;
-  top: 3px;  
+  top: 3px;
+  z-index: 12;
 }
-
-.sapce_room_user_video{
+.playing {
+ border: 3px solid green;
+}
+.sapce_room_user_video {
   position: absolute;
   top: 0;
   left: 0;

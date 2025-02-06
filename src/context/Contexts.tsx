@@ -1,5 +1,5 @@
 import { createContext, useContext, useRef } from "react";
-import { RoomChat, RoomUsers, UserSpaces } from "../types/StateTypes";
+import { ConsumerStreams, RoomChat, RoomUsers, UserSpaces } from "../types/StateTypes";
 
 interface AppState {
     test: () => void;
@@ -52,6 +52,7 @@ interface SocketState {
     stopProducingMedia: (kind: "audio" | "video") => void;
     startConsumingMedia: (producerId: string, produceUserId: string) => void;
     stopConsumingMedia: (produceUserId: string, kind: "audio" | "video") => void;
+    consumerStreams: ConsumerStreams;
 };
 
 export const SocketContext = createContext<SocketState | undefined>(undefined);

@@ -24,7 +24,7 @@ const Space = () => {
 
     const { setRoomId, userId, userSpaces, userName } = useAppContext();
     const { id } = useParams();
-    const { startProducingMedia, stopProducingMedia, joinedRoom, setJoinedRoom, micOn, setMicOn, videoOn, setVideoOn, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
+    const { consumerStreams, startProducingMedia, stopProducingMedia, joinedRoom, setJoinedRoom, micOn, setMicOn, videoOn, setVideoOn, joinedSpace, setJoinedSpace, roomUsers, sendMessage, roomMessages } = useSocketContext();
 
 
     useEffect(() => {
@@ -138,7 +138,7 @@ const Space = () => {
                 <User  {...user} key={i} />
             )
         })
-    }, [roomUsers]);
+    }, [roomUsers, consumerStreams]);
 
     const joinCallHandler = useCallback(async () => {
         setJoinedRoom(true);

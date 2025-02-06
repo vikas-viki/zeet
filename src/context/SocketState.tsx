@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from "react";
 import { SocketContext, useAppContext } from "./Contexts";
-import { Consumers, ConsumerStreams, ConsumerTransport, OtherUsers, ProducerTransport, RoomChat, RoomUsers, StateProps } from "../types/StateTypes";
+import { Consumers, ConsumerStreams, ConsumerTransport, OtherUsers, ProducerTransport, RoomChat, RoomStreams, RoomUsers, StateProps } from "../types/StateTypes";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "./AppState";
 import { constants } from "../helpers/constants";
@@ -77,7 +77,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                     videoPaused: true
                 };
             return { ...prev };
-        })
+        });
     }, []);
 
     const socket_leaveRoomHandler = useCallback((data: { userId: string }) => {
@@ -88,13 +88,13 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
         });
     }, []);
 
-    const socket_roomUsersHandler = useCallback((data: OtherUsers) => {
+    const socket_roomUsersHandler = useCallback((data: { users: OtherUsers, streams: RoomStreams }) => {
         console.log("Room users", data);
         setRoomUsers(prev => {
-            for (let key in data) {
-                if (!prev[key] && key !== "") {
+            for (let key in data.users) {
+                if (!prev[key] && key !== "" && key != userId) {
                     prev[key] = {
-                        userName: data[key],
+                        userName: data.users[key],
                         color: getRandomColor(),
                         audioProducerId: null,
                         videoProducerId: null,
@@ -103,8 +103,22 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                     }
                 }
             }
+            for (let stream in data.streams) {
+                if (data.streams[stream].audio && prev[stream]) {
+                    prev[stream].audioProducerId = data.streams[stream].producerId;
+                    prev[stream].audioPaused = false;
+                    startConsumingMedia(data.streams[stream].producerId, stream);
+                }
+                if (data.streams[stream].video && prev[stream]) {
+                    prev[stream].audioProducerId = data.streams[stream].producerId;
+                    prev[stream].videoPaused = false;
+                    startConsumingMedia(data.streams[stream].producerId, stream);
+                }
+            }
+            console.log("Room users", prev);
             return { ...prev };
-        })
+        });
+
     }, []);
 
     useEffect(() => {
@@ -313,24 +327,14 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
 
                 console.log("consuming: ", { consumerInfo }, _consumer.track);
 
-                if (consumerInfo.kind === "video") {
-                    console.log(userName + "_video");
-                    const videoElement = document.getElementById(userName + "_video") as HTMLVideoElement;
-                    videoElement.srcObject = newStream;
-                    videoElement.autoplay = true;
-                    videoElement.controls = false;
-                    videoElement.playsInline = true;
-                    await videoElement.play();
-                } else if (consumerInfo.kind === "audio") {
-                    const audioElement = new Audio();
-                    audioElement.id = _consumer.id;
-                    // audioElement.style.display = "none";
-                    audioElement.controls = true; // Debugging: Add controls to see if it's playing
-                    audioElement.srcObject = newStream;
-                    audioElement.autoplay = true;
-                    document.body.appendChild(audioElement);
-                    await audioElement.play();
-                }
+                const element = document.getElementById(userName + "_" + consumerInfo.kind) as HTMLMediaElement;
+                element.srcObject = newStream;
+                element.autoplay = true;
+                element.controls = false;
+                // element.playsInline = true;
+                element.parentElement?.classList.remove("room_user_bg");
+                await element.play();
+
             } else {
                 _consumer.resume();
                 (document.getElementById(_consumer.id) as HTMLMediaElement)?.play();
@@ -376,6 +380,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             stopProducingMedia,
             startConsumingMedia,
             stopConsumingMedia,
+            consumerStreams
         }}>
             {children}
         </SocketContext.Provider>

@@ -88,6 +88,14 @@ export type OtherUsers = {
     [userId: string]: string;
 }
 
+export type RoomStreams = {
+    [userId: string]: {
+        audio: boolean;
+        video: boolean;
+        producerId: string;
+    }
+}
+
 export type RoomChat = {
     userName: string;
     text: string;
