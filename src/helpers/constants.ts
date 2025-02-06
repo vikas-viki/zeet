@@ -41,6 +41,8 @@ export const constants = {
         collidingLeave: "3.2",
         joinedRoom: "3.3",
         leftRoom: "3.4",
+        messageInputFocused: "3.5",
+        messageInputBlurred: "3.6",
     },
     spaceRooms: {
         room1: ".1"

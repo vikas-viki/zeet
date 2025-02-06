@@ -264,6 +264,14 @@ export class GameScene extends Phaser.Scene {
     }
 
     private loadEventListeners() {
+        console.log("events: ", this.input.keyboard?.eventNames());
+        eventBus.on(constants.events.messageInputFocused, () => {
+            this.input.keyboard!.enabled = false;
+        });
+        eventBus.on(constants.events.messageInputBlurred, () => {
+            this.input.keyboard!.enabled = true;
+        });
+
         eventBus.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string, userName: string } }[]) => {
             console.log("other players ", data, this.userId, this.physics);
             data.forEach((user) => {
@@ -326,7 +334,7 @@ export class GameScene extends Phaser.Scene {
         eventBus.on(constants.events.leftRoom, () => {
             this.joinedStage = false;
             this.leftStage = true;
-            socket.emit(constants.client.leaveRoom, { userId: this.userId, roomId: this.spaceId + constants.spaceRooms.room1 });   
+            socket.emit(constants.client.leaveRoom, { userId: this.userId, roomId: this.spaceId + constants.spaceRooms.room1 });
         });
     }
 
