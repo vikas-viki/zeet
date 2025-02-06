@@ -28,7 +28,7 @@ function App() {
             window.localStorage.setItem("userName", res.data.userName);
             setUserId(res.data.userId);
             setUserName(res.data.userName);
-            if (window.location.pathname === "/" || window.location.pathname === "/login") {
+            if (window.location.pathname === "/login") {
               navigate("/spaces");
             } else {
               navigate(window.location.pathname);
@@ -47,7 +47,7 @@ function App() {
   }, [userId]);
 
   return (
-    <div className={`main ${window.location.pathname.split("/").length <= 2 && "main_padding"}`}>
+    <div className={`main`}>
       <Routes>
         <Route path="/" element={<Hero />} />
         <Route path="/login" element={<Login />} />

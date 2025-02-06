@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mail, Lock, User } from 'lucide-react';
 import { CredentialResponse, GoogleOAuthProvider } from '@react-oauth/google';
 import { GoogleLogin } from '@react-oauth/google';
@@ -22,6 +22,8 @@ function App() {
         confirmPassword: '',
         rememberMe: false,
     });
+
+    const { userId } = useAppContext();
 
     const navigate = useNavigate();
 
@@ -115,6 +117,12 @@ function App() {
         }
         await authorize(_formData, signup, true);
     }
+
+    useEffect(() => {
+        if (userId.length > 0) {
+            navigate("/spaces");
+        }
+    })
 
     return (
         <div className="auth_container">
