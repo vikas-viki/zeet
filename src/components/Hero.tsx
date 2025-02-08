@@ -40,7 +40,7 @@ function Hero() {
                     <FeatureCard
                         icon={<MessageSquare className="feature_icon" />}
                         title="Chat & Share"
-                        description="Real-time messaging and file sharing to keep conversations flowing"
+                        description="Real-time messaging and space sharing to keep conversations flowing"
                     />
                     <FeatureCard
                         icon={<Users className="feature_icon" />}
