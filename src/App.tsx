@@ -33,11 +33,11 @@ function App() {
             } else {
               navigate(window.location.pathname);
             }
-          } else if (res.data.message === "NO") {
+          } else if (res.data.message === "NO" && window.location.pathname !== "/") {
             navigate("/login");
           }
         }).catch((e) => {
-          navigate("/login");
+          // navigate("/login");
           console.log("error", e);
         });
       }

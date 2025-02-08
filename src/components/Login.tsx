@@ -119,10 +119,11 @@ function App() {
     }
 
     useEffect(() => {
+        console.log('User ID:', userId);
         if (userId.length > 0) {
             navigate("/spaces");
         }
-    })
+    }, [userId]);
 
     return (
         <div className="auth_container">
