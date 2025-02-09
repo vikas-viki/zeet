@@ -8,7 +8,9 @@ import * as mediaSoupClient from "mediasoup-client";
 import { DtlsParameters, RtpCapabilities, RtpParameters } from "mediasoup-client/lib/types";
 import toast from "react-hot-toast";
 
-export const socket = io(SERVER_URL);
+export const socket = io(SERVER_URL, {
+    transports: ["websocket"],
+});
 const SocketState: React.FC<StateProps> = ({ children }) => {
     const [joinedRoom, setJoinedRoom] = React.useState<boolean>(false);
     const [joinedSpace, setJoinedSpace] = React.useState<boolean>(false);
