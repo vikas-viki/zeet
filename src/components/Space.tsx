@@ -66,8 +66,8 @@ const Space = () => {
         } else {
             if (!joinedSpace) {
                 setJoinedSpace(true);
-                console.log("Joining space", window.localStorage.getItem("spaceId"));
-                socket.emit(constants.client.joinSpace, { userId, spaceId: id, userName: userName.slice(0, 5) });
+                console.log("Joining space", window.localStorage.getItem("spaceId"), userName);
+                socket.emit(constants.client.joinSpace, { userId, spaceId: id, userName: userName?.slice(0, 5) });
             }
         }
     }, [userId, userSpaces, userName]);

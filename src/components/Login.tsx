@@ -62,9 +62,9 @@ function App() {
                 }, { withCredentials: true });
 
                 if (response.status == 200) {
-                    toast.success("Login successful.");
                     setUserId(response.data.userId);
                     setUserName(response.data.userName);
+                    toast.success("Login successful.");
                     navigate("/spaces")
                 }
 
