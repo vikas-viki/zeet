@@ -62,7 +62,7 @@ const Space = () => {
             userSpaces.length == 0
         ) {
             gameRef.current?.destroy(true);
-            navigate("/spaces");
+            navigate("/login");
         } else {
             if (!joinedSpace) {
                 setJoinedSpace(true);

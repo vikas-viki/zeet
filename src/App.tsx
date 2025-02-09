@@ -37,7 +37,7 @@ function App() {
             navigate("/login");
           }
         }).catch((e) => {
-          // navigate("/login");
+          navigate("/");
           console.log("error", e);
         });
       }
