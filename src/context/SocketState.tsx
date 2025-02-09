@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect } from "react";
 import { SocketContext, useAppContext } from "./Contexts";
-import { Consumers, ConsumerStreams, ConsumerTransport, OtherUsers, ProducerTransport, RoomChat, RoomStreams, RoomUsers, StateProps } from "../types/StateTypes";
+import { Consumers, ConsumerStreams, OtherUsers, RoomChat, RoomStreams, RoomUsers, StateProps } from "../types/StateTypes";
 import { io } from "socket.io-client";
 import { SERVER_URL } from "./AppState";
 import { constants } from "../helpers/constants";
@@ -23,10 +23,8 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     const consumerTransport = React.useRef<mediaSoupClient.types.Transport | null>(null);
     const [consumerStreams, setConsumerStreams] = React.useState<ConsumerStreams>({});
     const [mediaSoupDevice, setMediaSoupDevice] = React.useState<mediaSoupClient.Device>(new mediaSoupClient.Device());
-    const [localStream, setLocalStream] = React.useState<MediaStream | null>(null);
 
     const { userName, userId } = useAppContext();
-    var socketId = '';
 
     socket.on(constants.server.userJoinedSpace, (data: any) => {
         console.log("User joined! space");
@@ -139,7 +137,6 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     useEffect(() => {
         socket.on("connect", () => {
             console.log("Socket connected!");
-            socketId = socket.id || "";
             document.title = socket.id!;
         });
 
@@ -169,6 +166,10 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                 return { ...prev };
             });
         })
+
+        if (!mediaSoupDevice) {
+            setMediaSoupDevice(new mediaSoupClient.Device());
+        }
         return () => {
             socket.off("connect");
         }
@@ -197,7 +198,6 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             const stream = await navigator.mediaDevices.getUserMedia({
                 [kind]: { deviceId: { exact: deviceId } }
             });
-            setLocalStream(stream);
 
             let _producerTransport = producerTransport.current;
 

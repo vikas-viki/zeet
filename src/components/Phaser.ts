@@ -21,7 +21,6 @@ export class GameScene extends Phaser.Scene {
 
     // event states
     private joinedStage: boolean = false;
-    private leftStage: boolean = false;
     public userId: string = "";
     private velocity: { [key: string]: number } = {};
     private stop: boolean = true;
@@ -328,12 +327,10 @@ export class GameScene extends Phaser.Scene {
 
         eventBus.on(constants.events.joinedRoom, (args: { spaceId: string, userName: string }) => {
             this.joinedStage = true;
-            this.leftStage = false;
             socket.emit(constants.client.joinRoom, { userId: this.userId, roomId: args.spaceId + constants.spaceRooms.room1, userName: args.userName });
         });
         eventBus.on(constants.events.leftRoom, () => {
             this.joinedStage = false;
-            this.leftStage = true;
             socket.emit(constants.client.leaveRoom, { userId: this.userId, roomId: this.spaceId + constants.spaceRooms.room1 });
         });
     }

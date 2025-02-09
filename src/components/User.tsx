@@ -5,7 +5,7 @@ import React from 'react';
 const User: React.FC<RoomUser> = (user) => {
     const [fullScreenPlaying, setFullScreenPlaying] = React.useState(false);
 
-    const handleVideoExpand = (e: React.MouseEvent) => {
+    const handleVideoExpand = () => {
         setFullScreenPlaying(prev => {
             const video = document.getElementById(user.userName + "_video") as HTMLVideoElement;
             if (!prev) {

@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameScene } from "./Phaser";
 import { eventBus } from "../helpers/EventBus";
-import { MessageSquareText, Mic, MicOff, PhoneCall, PhoneOff, SendHorizonal, Users, Video, VideoOff } from "lucide-react";
+import { MessageSquareText, Mic, MicOff, PhoneCall, PhoneOff, Users, Video, VideoOff } from "lucide-react";
 import { useAppContext, useSocketContext } from "../context/Contexts";
 import { useNavigate, useParams } from "react-router-dom";
 import { constants } from "../helpers/constants";

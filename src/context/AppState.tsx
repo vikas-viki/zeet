@@ -4,7 +4,6 @@ import { Spaces, StateProps, UserSpaces, UserSpacesResponse } from "../types/Sta
 import CryptoJS from 'crypto-js';
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 const test = () => {
     console.log("Hello");
@@ -20,8 +19,6 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const [userSpaces, setUserSpaces] = React.useState<UserSpaces>([]);
     const [spaces, setSpaces] = React.useState<Spaces>([]);
     const [roomId, setRoomId] = React.useState<string>('');
-
-    const navigate = useNavigate();
 
     const createSpace = async (name: string, toggleModel: CallableFunction) => {
         try {

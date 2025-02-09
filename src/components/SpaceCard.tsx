@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Copy, EllipsisVertical, Link, Pencil, Share, Trash } from "lucide-react";
+import {  EllipsisVertical, Link, Pencil, Share, Trash } from "lucide-react";
 import { SpaceCardProps } from "../types/StateTypes";
 import { useAppContext } from "../context/Contexts";
 import Modal from "./Modal";

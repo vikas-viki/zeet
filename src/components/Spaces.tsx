@@ -1,13 +1,11 @@
 import { useEffect } from "react";
 import Navbar from "./Navbar";
 import { useAppContext } from "../context/Contexts";
-import { useNavigate } from "react-router-dom";
 import SpaceCard from "./SpaceCard";
 import { SpaceProps } from "../types/StateTypes";
 
 function Spaces() {
     const { userId, getUserSpaces, userSpaces } = useAppContext();
-    const navigate = useNavigate();
 
     useEffect(() => {
         if (userId !== '') {
