@@ -25,6 +25,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
     const consumerTransport = React.useRef<mediaSoupClient.types.Transport | null>(null);
     const [consumerStreams, setConsumerStreams] = React.useState<ConsumerStreams>({});
     const [mediaSoupDevice, setMediaSoupDevice] = React.useState<mediaSoupClient.Device>(new mediaSoupClient.Device());
+    const [connectedSockets, setConnectedSockets] = React.useState<number>(0);
 
     const { userName, userId } = useAppContext();
 
@@ -141,6 +142,11 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             console.log("Socket connected!");
             document.title = socket.id!;
         });
+
+        socket.on(constants.server.noOfClients, (data: { count: number }) => {
+            console.log("No of clients", data.count);
+            setConnectedSockets(data.count);
+        })
 
         socket.on(constants.mediaSoup.userProducing, (data: { userId: string, kind: "audio" | "video", producerId: string }) => {
             console.log("producing", data);
@@ -382,7 +388,8 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             stopProducingMedia,
             startConsumingMedia,
             stopConsumingMedia,
-            consumerStreams
+            consumerStreams,
+            connectedSockets
         }}>
             {children}
         </SocketContext.Provider>

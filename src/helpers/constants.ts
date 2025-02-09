@@ -17,7 +17,8 @@ export const constants = {
         userMoved: "2.5",
         playersLocation: "2.6",
         roomUsers: "2.7",
-        message: "2.8"
+        message: "2.8",
+        noOfClients: "2.9"
     },
     webRTC: {
         offer: "3.1",

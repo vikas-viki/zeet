@@ -22,7 +22,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const createSpace = async (name: string, toggleModel: CallableFunction) => {
         try {
-            const response = await axios.post(`${SERVER_URL}/create-space`, {
+            const response = await axios.post(`${SERVER_URL}/space/create`, {
                 userId,
                 spaceName: name,
                 mapId: 'f6d3701d-79bb-4b8e-a001-98972ec281fc'
@@ -50,7 +50,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             else
                 _spaces = spaces;
 
-            const response = await axios.post(`${SERVER_URL}/get-user-spaces`,
+            const response = await axios.post(`${SERVER_URL}/space/get-user-spaces`,
                 { userId },
                 { withCredentials: true });
 
@@ -86,7 +86,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const getSpaceDetails = async (): Promise<Spaces> => {
         try {
-            const response = await axios.post(`${SERVER_URL}/get-maps`, { userId }, { withCredentials: true });
+            const response = await axios.post(`${SERVER_URL}/space/get-maps`, { userId }, { withCredentials: true });
             console.log({ spaces: response.data.spaces });
             setSpaces(response.data.spaces);
             return response.data.spaces;
@@ -99,7 +99,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const deleteSpace = async (_spaceId: string) => {
         console.log("delete space", { _spaceId });
         try {
-            const response = await axios.post(`${SERVER_URL}/delete-space`, {
+            const response = await axios.post(`${SERVER_URL}/space/delete`, {
                 spaceId: _spaceId,
                 userId
             }, { withCredentials: true });
@@ -116,7 +116,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const editSpace = async (_spaceId: string, newSpaceName: string, toggleModel: CallableFunction) => {
         try {
-            const response = await axios.post(`${SERVER_URL}/edit-space`, {
+            const response = await axios.post(`${SERVER_URL}/space/edit`, {
                 spaceId: _spaceId,
                 newSpaceName,
                 userId
@@ -141,7 +141,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const updateNickName = async (newUsername: string) => {
         try {
-            const response = await axios.patch(`${SERVER_URL}/update-username`, {
+            const response = await axios.patch(`${SERVER_URL}/user/update-username`, {
                 userId,
                 newUsername
             }, { withCredentials: true });
@@ -158,7 +158,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const updatePassword = async (password: string) => {
         try {
-            const response = await axios.patch(`${SERVER_URL}/update-password`, {
+            const response = await axios.patch(`${SERVER_URL}/user/update-password`, {
                 userId,
                 password: getHash(password)
             }, { withCredentials: true });
@@ -179,7 +179,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const linkSpace = async (spaceId: string, toggleModel: CallableFunction) => {
         try {
-            const response = await axios.post(`${SERVER_URL}/link-space`,
+            const response = await axios.post(`${SERVER_URL}/space/link`,
                 {
                     userId,
                     spaceId
@@ -205,7 +205,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
     const unlinkSpace = async (_spaceId: string) => {
         console.log("unlink space", { _spaceId });
         try {
-            const response = await axios.post(`${SERVER_URL}/unlink-space`, {
+            const response = await axios.post(`${SERVER_URL}/space/unlink`, {
                 spaceId: _spaceId,
                 userId
             }, { withCredentials: true });

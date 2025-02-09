@@ -1,8 +1,11 @@
 import { ArrowRight, Circle, Globe2, MessageSquare, Users, Video, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSocketContext } from "../context/Contexts";
 
 function Hero() {
     const navigate = useNavigate();
+
+    const { connectedSockets } = useSocketContext();
 
     return (
         <div className="hero">
@@ -23,7 +26,7 @@ function Hero() {
                 </div>
                 <div className="hero_section_2_image">
                     <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=800&q=80" alt="#" />
-                    <span><Circle size={18} />19 Online now</span>
+                    <span><Circle size={18} />{connectedSockets} Online now</span>
                 </div>
             </div>
             <div className="hero_section_3">

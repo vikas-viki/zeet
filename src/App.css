@@ -1287,6 +1287,7 @@ form input {
   width: 500px;
   border-radius: 15px;
   overflow: hidden;
+  height: max-content;
 }
 
 .profile_container_1 {
@@ -1349,16 +1350,22 @@ form input {
   margin: 0px;
 }
 
-.profile_container_2 {
+.profile_container_2,
+.profile_container_3 {
   padding: 25px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
+.profile_container_3 {
+  padding-top: 0px;
+}
+
 .change_password_button,
 .change_password_container input,
-.change_password_container button {
+.change_password_container button,
+.logout_button {
   border: none;
   outline: none;
   display: flex;
@@ -1372,6 +1379,11 @@ form input {
   font-weight: 500;
   font-family: "Poppins";
   cursor: pointer;
+}
+
+.logout_button {
+  font-weight: 500;
+  background-color: #f35656f0;
 }
 
 .change_password_container {

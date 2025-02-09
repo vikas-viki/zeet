@@ -1,7 +1,10 @@
-import { KeyRound, Pencil, Save, X } from "lucide-react";
+import { KeyRound, LogOut, Pencil, Save, X } from "lucide-react";
 import profile from "../assets/profile.png";
 import { useEffect, useState } from "react";
 import { useAppContext } from "../context/Contexts";
+import axios from "axios";
+import { SERVER_URL } from "../context/AppState";
+import toast from "react-hot-toast";
 
 const Profile = () => {
     const [editName, setEditName] = useState(false);
@@ -9,12 +12,29 @@ const Profile = () => {
     const [newPassword, setNewPassword] = useState("");
     const [tempNewName, setTempNewName] = useState("CoolPlayer123");
 
-    const { updateNickName, userName, setUserName, updatePassword, userId } = useAppContext();
+    const { updateNickName, userName, setUserName, updatePassword, userId, setUserId } = useAppContext();
 
     const saveName = () => {
         updateNickName(tempNewName);
         setUserName(tempNewName);
         setEditName(false);
+    }
+
+    const logout = () => {
+        axios.post(`${SERVER_URL}/auth/logout`, {}, { withCredentials: true }).then((res) => {
+            if (res.data.message === "LOGOUT_SUCCESS") {
+                setUserId("");
+                localStorage.removeItem("userId");
+                localStorage.removeItem("userName");
+                toast.success("Logged out successfully");
+                window.location.href = "/login"
+            } else {
+                toast.error("Failed to logout");
+            }
+        }).catch((err) => {
+            toast.error("Failed to logout");
+            console.log(err);
+        });;
     }
 
     useEffect(() => {
@@ -60,7 +80,6 @@ const Profile = () => {
                                     onChange={(e) => setNewPassword(e.target.value)}
                                 />
                                 <div>
-
                                     <button className="save_password_button"
                                         onClick={() => {
                                             updatePassword(newPassword);
@@ -89,6 +108,9 @@ const Profile = () => {
                             </button>
                         )
                     }
+                </div>
+                <div className="profile_container_3">
+                    <button className="logout_button" onClick={logout}> <LogOut size={20} /> Logout</button>
                 </div>
             </div>
         </div>

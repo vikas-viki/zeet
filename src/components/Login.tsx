@@ -38,7 +38,7 @@ function App() {
     const authorize = async (_formData: any, signup: boolean, google: boolean) => {
         try {
             if (signup) {
-                const response = await axios.post(`${SERVER_URL}/signup`, {
+                const response = await axios.post(`${SERVER_URL}/auth/signup`, {
                     email: _formData.email,
                     username: _formData.username,
                     password: google ? _formData.password : getHash(_formData.password),
@@ -55,7 +55,7 @@ function App() {
 
                 console.log({ signup: response });
             } else {
-                const response = await axios.post(`${SERVER_URL}/login`, {
+                const response = await axios.post(`${SERVER_URL}/auth/login`, {
                     email: _formData.email,
                     password: google ? _formData.password : getHash(_formData.password),
                     rememberMe: _formData.rememberMe

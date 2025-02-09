@@ -53,6 +53,7 @@ interface SocketState {
     startConsumingMedia: (producerId: string, produceUserId: string) => void;
     stopConsumingMedia: (produceUserId: string, kind: "audio" | "video") => void;
     consumerStreams: ConsumerStreams;
+    connectedSockets: number;
 };
 
 export const SocketContext = createContext<SocketState | undefined>(undefined);

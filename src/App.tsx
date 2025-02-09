@@ -21,7 +21,7 @@ function App() {
   useEffect(() => {
     try {
       if (userId === "") {
-        axios.post(`${SERVER_URL}/youknowme`, {}, { withCredentials: true }).then(res => {
+        axios.post(`${SERVER_URL}/auth/youknowme`, {}, { withCredentials: true }).then(res => {
           console.log(res.data);
           if (res.data.message === "YES") {
             window.localStorage.setItem("userId", res.data.userId);
