@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
+    "@types/events": "^3.0.3",
     "@types/socket.io-client": "^3.0.0",
     "axios": "^1.7.9",
     "crypto-js": "^4.2.0",
