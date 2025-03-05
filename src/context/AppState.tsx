@@ -58,7 +58,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
                 setUserSpaces([]);
                 console.log("No space found!");
             } else {
-                const _userSpaces: UserSpacesResponse = response.data.userSpaces;
+                const _userSpaces: UserSpacesResponse = response.data.userspaces;
 
                 var user_spaces = [];
                 for (let i = 0; i < _userSpaces.length; i++) {

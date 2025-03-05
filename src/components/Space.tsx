@@ -192,18 +192,46 @@ const Space = () => {
     }, [micOn]);
 
     const micOptions = () => {
-        const devices = mediaDevices.current.filter(device => device.kind === "audioinput");
+        const inputDevices = mediaDevices.current.filter(device => device.kind === "audioinput");
+        const outputDevices = mediaDevices.current.filter(device => device.kind === "audiooutput");
 
         return (
-            <div className={`space_mic_options ${showMicOptions ? "options_on" : "options_off"}`}>
-                {
-                    devices.map((device, i) => {
-                        return (
-                            <button title={device.label} key={i} onClick={() => selectDeviceHandler(device.deviceId, true)}>{
-                                device.label.slice(0, 20) + (device.label.length > 20 ? "..." : "")}</button>
-                        )
-                    })
-                }
+            <div className="space_mic_options_container">
+                <div className={`space_mic_options ${showMicOptions ? "options_on" : "options_off"}`}>
+                    {
+                        inputDevices.map((device, i) => {
+                            return (
+                                <>
+                                    {
+                                        i == 0 && (
+
+                                            <span>Input Devices</span>
+                                        )
+                                    }
+                                    <button title={device.label} key={i} onClick={() => selectDeviceHandler(device.deviceId, true)}>{
+                                        device.label.slice(0, 20) + (device.label.length > 20 ? "..." : "")}</button>
+                                </>
+                            )
+                        })
+                    }
+                </div>
+                <div className={`space_mic_options ${showMicOptions ? "options_on" : "options_off"}`}>
+                    {
+                        outputDevices.map((device, i) => {
+                            return (
+                                <>
+                                    {
+                                        i == 0 && (
+                                            <span>Output Devices</span>
+                                        )
+                                    }
+                                    <button title={device.label} key={i} onClick={() => selectDeviceHandler(device.deviceId, true)}>{
+                                        device.label.slice(0, 20) + (device.label.length > 20 ? "..." : "")}</button>
+                                </>
+                            )
+                        })
+                    }
+                </div>
             </div>
         )
     }

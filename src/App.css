@@ -868,6 +868,13 @@ form input {
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.147);
 }
 
+.space_mic_options_container{
+  /* position: relative; */
+  display: flex;
+  gap: 10px;
+  flex-direction: row;
+}
+
 .space_join_call:hover {
   background-color: #218838;
   transform: translateY(-2px);
