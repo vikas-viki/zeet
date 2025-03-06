@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GameScene } from "./Phaser";
 import { eventBus } from "../helpers/EventBus";
-import { MessageSquareText, Mic, MicOff, PhoneCall, PhoneOff, Users, Video, VideoOff } from "lucide-react";
+import { ChevronUp, MessageSquareText, Mic, MicOff, PhoneCall, PhoneOff, Users, Video, VideoOff } from "lucide-react";
 import { useAppContext, useSocketContext } from "../context/Contexts";
 import { useNavigate, useParams } from "react-router-dom";
 import { constants } from "../helpers/constants";
@@ -138,7 +138,7 @@ const Space = () => {
                 <User  {...user} key={i} />
             )
         })
-    }, [roomUsers, consumerStreams]);
+    }, [joinedRoom, roomUsers, consumerStreams]);
 
     const joinCallHandler = useCallback(async () => {
         setJoinedRoom(true);
@@ -155,10 +155,10 @@ const Space = () => {
 
     const micOnHandler = useCallback(async () => {
         if (!micOn) {
-            toast.loading("Select an input device", {
-                duration: 2000
+            startProducingMedia("audio", "default").then(() => {
+                setMicOn(true);
+                setShowMicOptions(false);
             });
-            setShowMicOptions(true);
         } else {
             stopProducingMedia("audio");
             setMicOn(false);
@@ -167,10 +167,10 @@ const Space = () => {
 
     const cameraOnHandler = useCallback(async () => {
         if (!videoOn) {
-            toast.loading("Select an input device", {
-                duration: 2000
-            });
-            setShowCameraOptions(true);
+            startProducingMedia("video", "default").then(() => {
+                setVideoOn(true);
+                setShowCameraOptions(false);
+            })
         } else {
             stopProducingMedia("video");
             setVideoOn(false);
@@ -191,31 +191,30 @@ const Space = () => {
         }
     }, [micOn]);
 
-    const micOptions = () => {
+    const micOptions = useMemo(() => {
         const inputDevices = mediaDevices.current.filter(device => device.kind === "audioinput");
         const outputDevices = mediaDevices.current.filter(device => device.kind === "audiooutput");
 
         return (
-            <div className="space_mic_options_container">
-                <div className={`space_mic_options ${showMicOptions ? "options_on" : "options_off"}`}>
+            <div className={`space_mic_options_container ${showMicOptions ? "options_on" : "options_off"}`}>
+                <div className={`space_mic_options input_mic_devices `}>
                     {
                         inputDevices.map((device, i) => {
                             return (
                                 <>
                                     {
                                         i == 0 && (
-
                                             <span>Input Devices</span>
                                         )
                                     }
                                     <button title={device.label} key={i} onClick={() => selectDeviceHandler(device.deviceId, true)}>{
-                                        device.label.slice(0, 20) + (device.label.length > 20 ? "..." : "")}</button>
+                                        device.label.slice(0, 19) + (device.label.length > 20 ? "..." : "")}</button>
                                 </>
                             )
                         })
                     }
                 </div>
-                <div className={`space_mic_options ${showMicOptions ? "options_on" : "options_off"}`}>
+                <div className={`space_mic_options output_mic_devices `}>
                     {
                         outputDevices.map((device, i) => {
                             return (
@@ -226,7 +225,7 @@ const Space = () => {
                                         )
                                     }
                                     <button title={device.label} key={i} onClick={() => selectDeviceHandler(device.deviceId, true)}>{
-                                        device.label.slice(0, 20) + (device.label.length > 20 ? "..." : "")}</button>
+                                        device.label.slice(0, 19) + (device.label.length > 20 ? "..." : "")}</button>
                                 </>
                             )
                         })
@@ -234,7 +233,7 @@ const Space = () => {
                 </div>
             </div>
         )
-    }
+    }, [showMicOptions, mediaDevices]);
 
     const cameraOptions = () => {
         const devices = mediaDevices.current.filter(device => device.kind === "videoinput");
@@ -267,31 +266,58 @@ const Space = () => {
                 {
                     joinedRoom === true &&
                     <div className="space_joined_options">
-                        <div className="space_mic_btn">
-                            {micOptions()}
-                            <button className={`space_mic ${micOn ? "mic_on" : "mic_off"}`}
-                                onClick={micOnHandler}
-                            >
-                                {
-                                    micOn ?
-                                        <Mic />
-                                        :
-                                        <MicOff />
-                                }
-                            </button>
+                        <div className="">
+                            {micOptions}
+                            <div className="space_mic_btn">
+                                <button className={`space_mic ${micOn ? "mic_on" : "mic_off"}`}
+                                    onClick={micOnHandler}
+                                >
+                                    {
+                                        micOn ?
+                                            <Mic />
+                                            :
+                                            <MicOff />
+                                    }
+                                </button>
+                                <button className="mic_options" onClick={() => {
+                                    setShowMicOptions(prev => {
+                                        if (!prev)
+                                            toast.loading("Select an input device", {
+                                                duration: 2000
+                                            })
+                                        return !prev;
+                                    });
+                                }}>
+                                    <ChevronUp size={20} />
+                                </button>
+                            </div>
                         </div>
                         <div className="space_camera_btn">
                             {cameraOptions()}
-                            <button className={`space_video ${videoOn ? "vid_on" : "vid_off"}`}
-                                onClick={cameraOnHandler}
-                            >
-                                {
-                                    videoOn ?
-                                        <Video />
-                                        :
-                                        <VideoOff />
-                                }
-                            </button>
+                            <div className="space_video_btn">
+                                <button className={`space_video ${videoOn ? "vid_on" : "vid_off"}`}
+                                    onClick={cameraOnHandler}
+                                >
+                                    {
+                                        videoOn ?
+                                            <Video />
+                                            :
+                                            <VideoOff />
+                                    }
+                                </button>
+                                <button className="mic_options" onClick={() => {
+                                    setShowCameraOptions(prev => {
+                                        if (!prev)
+                                            toast.loading("Select an input device", {
+                                                duration: 2000
+                                            })
+                                        return !prev;
+                                    }
+                                    );
+                                }}>
+                                    <ChevronUp size={20} />
+                                </button>
+                            </div>
                         </div>
                         <button className="space_leave_call"
                             id="space_leave_call"

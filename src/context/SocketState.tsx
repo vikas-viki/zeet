@@ -203,9 +203,16 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
             const roomId = window.localStorage.getItem("spaceId") + constants.spaceRooms.room1;
             const constraints = kind === "audio" ? { audio: true } : { video: true };
             await navigator.mediaDevices.getUserMedia(constraints);
-            const stream = await navigator.mediaDevices.getUserMedia({
-                [kind]: { deviceId: { exact: deviceId } }
-            });
+            var stream;
+            if (deviceId !== "default") {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    [kind]: { deviceId: { exact: deviceId } }
+                });
+            } else {
+                stream = await navigator.mediaDevices.getUserMedia({
+                    [kind]: true
+                });
+            }
 
             let _producerTransport = producerTransport.current;
 
@@ -255,7 +262,7 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                 console.log(`Resuming ${kind} producer`);
                 producer.resume();
                 producerId = producer.id;
-                await producer.replaceTrack({ track: stream.getTracks()[0] });
+                await producer.replaceTrack({ track });
 
                 console.log(`${kind} track stopped`);
 

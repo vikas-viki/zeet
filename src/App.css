@@ -868,11 +868,51 @@ form input {
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.147);
 }
 
-.space_mic_options_container{
-  /* position: relative; */
+.space_mic_options_container {
   display: flex;
   gap: 10px;
   flex-direction: row;
+  width: 100%;
+  position: relative;
+  top: 50px;
+  transition: all 0.3s ease;
+}
+
+.space_mic_options {
+  height: 200px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.space_mic_options button {
+  transition: all 0.9s ease;
+}
+
+.space_mic_options span {
+  padding: 10px 0px;
+  position: sticky;
+  top: 0;
+  background-color: grey;
+  width: 100%;
+  text-align: center;
+  font-weight: bold;
+  display: block;
+  color: #fff;
+  border-bottom: 2px solid grey;
+}
+
+.space_mic_options::-webkit-scrollbar {
+  display: none;
+}
+
+.input_mic_devices {
+  position: absolute;
+  left: -150px;
+}
+
+.output_mic_devices {
+  position: absolute;
+  right: -200px;
 }
 
 .space_join_call:hover {
@@ -955,8 +995,8 @@ form input {
   display: flex;
   justify-content: space-around;
   height: 0px;
-  position: relative;
-  top: 3px;
+  position: absolute;
+  bottom: 6px;
   z-index: 12;
 }
 
@@ -968,10 +1008,21 @@ form input {
   position: absolute;
   top: 0;
   left: 0;
+  object-fit: cover;
+  border: 2px solid grey;
+  border-radius: 10px;
+}
+
+.video_minimised {
+  width: 0px;
+  height: 0px;
+  display: none;
+}
+
+.video_maximised {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  z-index: -1;
+  display: block;
 }
 
 .space_mic_options,
@@ -985,11 +1036,13 @@ form input {
 }
 
 .options_on {
-  display: block;
+  opacity: 1;
 }
 
 .options_off {
-  display: none;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
 }
 
 .space_mic_options button,
@@ -997,7 +1050,7 @@ form input {
   background-color: transparent;
   border: none;
   outline: none;
-  padding: 10px;
+  padding: 10px 15px;
   width: 100%;
   font-size: 15px;
   font-weight: 500;
@@ -1011,6 +1064,8 @@ form input {
 }
 
 .space_mic_options button:hover {
+  transition: all 0.2s ease;
+  transform: scale(1.03);
   background-color: #6c6c6c;
 }
 
@@ -1205,6 +1260,7 @@ form input {
 }
 
 .space_room_user {
+  position: fixed;
   padding: 15px 22px;
   font-size: 18px;
   border-radius: 50%;
@@ -1245,9 +1301,33 @@ form input {
   gap: 30px;
 }
 
+.space_mic_btn,
+.space_video_btn {
+  display: flex;
+  border-radius: 10px;
+  overflow: hidden;
+
+}
+
+.mic_options {
+  border: none;
+  outline: none;
+  background-color: #962525;
+  color: rgb(236, 236, 236);
+  padding: 0px 8px;
+  cursor: pointer;
+}
+
+.space_mic_btn:last-child,
+.space_video_btn:last-child {
+  background-color: #962525;
+}
+
 .space_mic,
 .space_video {
   border-radius: 10px;
+  padding-right: 15px;
+  padding-left: 15px;
 }
 
 .mic_off,
