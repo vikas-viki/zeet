@@ -343,12 +343,15 @@ const SocketState: React.FC<StateProps> = ({ children }) => {
                 console.log("consuming: ", { consumerInfo }, _consumer.track);
 
                 const element = document.getElementById(userName + "_" + consumerInfo.kind) as HTMLMediaElement;
-                element.srcObject = newStream;
-                element.autoplay = true;
-                element.controls = false;
-                // element.playsInline = true;
-                element.parentElement?.classList.remove("room_user_bg");
-                await element.play();
+
+                if (element) {
+                    element.srcObject = newStream;
+                    element.autoplay = true;
+                    element.controls = false;
+                    // element.playsInline = true;
+                    element.parentElement?.classList.remove("room_user_bg");
+                    await element.play();
+                }
 
             } else {
                 _consumer.resume();

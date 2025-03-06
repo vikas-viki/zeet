@@ -1,4 +1,4 @@
-import { Maximize, Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import { Maximize, Mic, MicOff, Video, VideoOff, X } from 'lucide-react';
 import { RoomUser } from '../types/StateTypes';
 import React from 'react';
 import Draggable from 'react-draggable';
@@ -7,43 +7,31 @@ import "react-resizable/css/styles.css";
 
 const User: React.FC<RoomUser> = (user) => {
     const [fullScreenPlaying, setFullScreenPlaying] = React.useState(false);
-    const videoRef = React.useRef<HTMLVideoElement>(null);
     const [maximised, setMaximised] = React.useState(false);
 
     const handleVideoExpand = () => {
         setFullScreenPlaying(prev => {
-            // if (!prev) {
-            // videoRef.current!.requestPictureInPicture();
-            // }
             return !prev;
         });
         setMaximised(true);
     };
 
-    // React.useEffect(() => {
-    //     const video = document.getElementById(user.userName + "_video") as HTMLVideoElement;
-
-    //     if (video) {
-    //         video.addEventListener("leavepictureinpicture", () => {
-    //             setFullScreenPlaying(false);
-    //         });
-    //     }
-
-    //     return () => {
-    //         if (video) {
-    //             video.removeEventListener("leavepictureinpicture", () => {
-    //                 setFullScreenPlaying(false);
-    //             });
-    //         }
-    //     };
-    // }, []);
+    const minimizeVideo = () => {
+        setMaximised(false);
+        setFullScreenPlaying(false);
+    }
 
     return (
-        <div className={`space_room_user_container ${(user.videoPaused || fullScreenPlaying) && "room_user_bg"}`} title={user.userName}>
+        <div className={`space_room_user_container room_user_bg`} title={user.userName}>
             <div className={`${maximised == true ? "video_maximised" : "video_minimised"}`}>
                 <Draggable>
-                    <ResizableBox width={200} height={200} minConstraints={[160, 90]} maxConstraints={[640, 360]} resizeHandles={['se']}>
-                        <video ref={videoRef} id={user.userName + "_video"} className={`sapce_room_user_video`} autoPlay playsInline></video>
+                    <ResizableBox width={305} height={200} maxConstraints={[600, 400]} resizeHandles={['se']}>
+                        <div>
+                            <video id={user.userName + "_video"} className={`sapce_room_user_video`} autoPlay playsInline></video>
+                            <button className='close_video' onClick={minimizeVideo}>
+                                <X style={{ backgroundColor: "grey", borderRadius: "4px", cursor: "pointer" }} />
+                            </button>
+                        </div>
                     </ResizableBox>
                 </Draggable>
             </div>

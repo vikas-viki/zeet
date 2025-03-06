@@ -984,6 +984,19 @@ form input {
   border-radius: 8px;
 }
 
+.close_video {
+  border: none;
+  outline: none;
+  position: relative;
+  top: -10px;
+  left: -10px;
+  padding: 0px;
+  background: transparent;
+  cursor: pointer;
+  width: max-content;
+  height: max-content;
+}
+
 .space_room_user_container:hover .user_video_full_screen {
   scale: 1.1;
   padding: 26px 2px;
@@ -1011,6 +1024,8 @@ form input {
   object-fit: cover;
   border: 2px solid grey;
   border-radius: 10px;
+  width: 300px;
+  height: 200px;
 }
 
 .video_minimised {
