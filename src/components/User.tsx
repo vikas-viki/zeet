@@ -1,12 +1,13 @@
 import { Maximize, Mic, MicOff, Move, Video, VideoOff, X } from 'lucide-react';
 import { RoomUser } from '../types/StateTypes';
-import React from 'react';
+import React, { useRef } from 'react';
 import Draggable from 'react-draggable';
 import { ResizableBox } from 'react-resizable';
 
 const User: React.FC<RoomUser> = (user) => {
     const [fullScreenPlaying, setFullScreenPlaying] = React.useState(false);
     const [maximised, setMaximised] = React.useState(false);
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     const handleVideoExpand = () => {
         setFullScreenPlaying(prev => {
@@ -24,15 +25,20 @@ const User: React.FC<RoomUser> = (user) => {
         <div className={`space_room_user_container room_user_bg`} title={user.userName}>
             <div className={`${maximised == true ? "video_maximised" : "video_minimised"}`}>
                 <Draggable handle=".video_dragger">
-                    <ResizableBox width={300} height={200} resizeHandles={["se"]} style={{ position: "relative" }}>
+                    <ResizableBox width={300} height={200} resizeHandles={["se"]} >
                         <div className='video_container'>
-                            <video id={user.userName + "_video"} className={`sapce_room_user_video`} autoPlay playsInline></video>
+                            <video ref={videoRef} id={user.userName + "_video"} className={`sapce_room_user_video`} autoPlay playsInline></video>
                             <div className='video_controls'>
                                 <button className='close_video' onClick={minimizeVideo}>
-                                    <X style={{  borderRadius: "4px", cursor: "pointer" }} size={20}/>
+                                    <X style={{ borderRadius: "4px", cursor: "pointer" }} size={20} />
                                 </button>
                                 <button className='video_dragger'>
-                                    <Move style={{  borderRadius: "4px", cursor: "pointer" }} size={20} />
+                                    <Move style={{ borderRadius: "4px", cursor: "grab" }} size={20} />
+                                </button>
+                                <button className='full_screen' onClick={() => {
+                                    videoRef.current?.requestFullscreen();
+                                }}>
+                                    <Maximize style={{ borderRadius: "4px", cursor: "pointer" }} size={20} />
                                 </button>
                             </div>
                         </div>
