@@ -984,19 +984,6 @@ form input {
   border-radius: 8px;
 }
 
-.close_video {
-  border: none;
-  outline: none;
-  position: relative;
-  top: -10px;
-  left: -10px;
-  padding: 0px;
-  background: transparent;
-  cursor: pointer;
-  width: max-content;
-  height: max-content;
-}
-
 .space_room_user_container:hover .user_video_full_screen {
   scale: 1.1;
   padding: 26px 2px;
@@ -1017,15 +1004,63 @@ form input {
   border: 3px solid green;
 }
 
-.sapce_room_user_video {
+.video_container {
+  width: 100%;
+  height: 100%;
+  top: -500px;
   position: absolute;
-  top: 0;
+}
+
+.video_dragger,
+.close_video {
+  padding: 0px;
+  z-index: 10;
+  border: none;
+  outline: none;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+  width: max-content;
+  stroke-width: 1;
+}
+
+.video_dragger svg,
+.close_video svg {
+  background-color: #b8b8b8;
+}
+
+.video_dragger svg {
+  width: 16.5px;
+  height: 16.5px;
+  padding: 2px;
+}
+
+.video_controls {
+  display: flex;
+  padding: 5px;
+  border-radius: 3px;
+  gap: 8px;
+  background-color: grey;
+  width: max-content;
+  position: relative;
+  top: -10px;
+  left: -10px;
+}
+
+.sapce_room_user_video {
+  overflow: auto;
   left: 0;
   object-fit: cover;
   border: 2px solid grey;
   border-radius: 10px;
   width: 300px;
   height: 200px;
+  resize: both;
+  position: absolute;
+}
+
+.sapce_room_user_video::-webkit-scrollbar {
+  display: none;
 }
 
 .video_minimised {

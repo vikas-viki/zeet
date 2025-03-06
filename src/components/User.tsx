@@ -1,9 +1,8 @@
-import { Maximize, Mic, MicOff, Video, VideoOff, X } from 'lucide-react';
+import { Maximize, Mic, MicOff, Move, Video, VideoOff, X } from 'lucide-react';
 import { RoomUser } from '../types/StateTypes';
 import React from 'react';
 import Draggable from 'react-draggable';
 import { ResizableBox } from 'react-resizable';
-import "react-resizable/css/styles.css";
 
 const User: React.FC<RoomUser> = (user) => {
     const [fullScreenPlaying, setFullScreenPlaying] = React.useState(false);
@@ -24,13 +23,18 @@ const User: React.FC<RoomUser> = (user) => {
     return (
         <div className={`space_room_user_container room_user_bg`} title={user.userName}>
             <div className={`${maximised == true ? "video_maximised" : "video_minimised"}`}>
-                <Draggable>
-                    <ResizableBox width={305} height={200} maxConstraints={[600, 400]} resizeHandles={['se']}>
-                        <div>
+                <Draggable handle=".video_dragger">
+                    <ResizableBox width={300} height={200} resizeHandles={["se"]} style={{ position: "relative" }}>
+                        <div className='video_container'>
                             <video id={user.userName + "_video"} className={`sapce_room_user_video`} autoPlay playsInline></video>
-                            <button className='close_video' onClick={minimizeVideo}>
-                                <X style={{ backgroundColor: "grey", borderRadius: "4px", cursor: "pointer" }} />
-                            </button>
+                            <div className='video_controls'>
+                                <button className='close_video' onClick={minimizeVideo}>
+                                    <X style={{  borderRadius: "4px", cursor: "pointer" }} size={20}/>
+                                </button>
+                                <button className='video_dragger'>
+                                    <Move style={{  borderRadius: "4px", cursor: "pointer" }} size={20} />
+                                </button>
+                            </div>
                         </div>
                     </ResizableBox>
                 </Draggable>
