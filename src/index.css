@@ -1,0 +1,14 @@
+
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap');
+@import "tailwindcss";
+
+
+@font-face {
+    font-family: "NyghtSerif-bold";
+    src: url("../public/fonts/NyghtSerif-BoldItalic.woff");
+}
+
+*{
+    scroll-behavior: smooth;
+}
