@@ -1,4 +1,4 @@
-import { Check, Circle, Github, Linkedin, Square, Sun, Triangle, Twitter } from "lucide-react";
+import { Check, Github, Layers, Linkedin, Mail, Network, Sun,Twitter } from "lucide-react";
 import "../index.css";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -67,7 +67,7 @@ function Hero() {
                 <div className="grid md:grid-cols-3 gap-8">
                     <div className={featureContainerClass}>
                         <div className="w-12 h-12 bg-black rounded-lg flex items-center justify-center mb-6">
-                            <Square className="w-6 h-6 text-white" />
+                            <Network className="w-6 h-6 text-white" />
                         </div>
                         <h3 className={featureTitleClasses}>Low-latency communication.</h3>
                         <p className={`${light ? "text-gray-600" : "text-gray-400"}`}>
@@ -78,7 +78,7 @@ function Hero() {
 
                     <div className={featureContainerClass}>
                         <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-6">
-                            <Circle className="w-6 h-6 text-white" />
+                            <Mail className="w-6 h-6 text-white" />
                         </div>
                         <h3 className={featureTitleClasses}>Instant chat.</h3>
                         <p className={`${light ? "text-gray-600" : "text-gray-400"}`}>
@@ -88,13 +88,15 @@ function Hero() {
                     </div>
 
                     <div className={featureContainerClass}>
-                        <div className="w-13 h-12 bg-black flex items-center relative justify-center mb-6" style={{
-                            clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
-                        }}>
-                            <Triangle className="w-6 h-5 top-[20px] absolute text-white" >
-
-                            </Triangle>
+                        <div
+                            className="w-14 h-14 bg-black flex items-center justify-center relative mb-6"
+                            style={{
+                                clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                            }}
+                        >
+                            <Layers className="w-6 h-6 text-white" />
                         </div>
+
                         <h3 className={featureTitleClasses}>Scalable infrastructure.</h3>
                         <p className={`${light ? "text-gray-600" : "text-gray-400"}`}>
                             Node.js backend on AWS with PostgreSQL for robust, global availability
