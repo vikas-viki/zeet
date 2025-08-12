@@ -4,6 +4,7 @@ import { Spaces, StateProps, UserSpaces, UserSpacesResponse } from "../types/Sta
 import CryptoJS from 'crypto-js';
 import axios from "axios";
 import toast from "react-hot-toast";
+import { DEFAULT_MAP_ID } from "../helpers/constants";
 
 const test = () => {
     console.log("Hello");
@@ -25,7 +26,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             const response = await axios.post(`${SERVER_URL}/space/create`, {
                 userId,
                 spaceName: name,
-                mapId: 'f6d3701d-79bb-4b8e-a001-98972ec281fc'
+                mapId: DEFAULT_MAP_ID
             }, { withCredentials: true });
             if (response.status == 200 && response.data.message === "SUCCESS") {
                 await getUserSpaces();
@@ -44,7 +45,7 @@ const AppState: React.FC<StateProps> = ({ children }) => {
 
     const getUserSpaces = async () => {
         try {
-            var _spaces;
+            let _spaces;
             if (spaces.length == 0)
                 _spaces = await getSpaceDetails();
             else
@@ -60,9 +61,9 @@ const AppState: React.FC<StateProps> = ({ children }) => {
             } else {
                 const _userSpaces: UserSpacesResponse = response.data.userspaces;
 
-                var user_spaces = [];
+                const user_spaces = [];
                 for (let i = 0; i < _userSpaces.length; i++) {
-                    let _space = _spaces.filter(e => e.mapid === _userSpaces[i].mapid)[0];
+                    const _space = _spaces.filter(e => e.mapid === _userSpaces[i].mapid)[0];
                     user_spaces.push({
                         spaceimage: _space.banner,
                         spaceid: _userSpaces[i].spaceid,

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {  EllipsisVertical, Link, Pencil, Share, Trash } from "lucide-react";
+import { EllipsisVertical, Link, Pencil, Share, Trash } from "lucide-react";
 import { SpaceCardProps } from "../types/StateTypes";
 import { useAppContext } from "../context/Contexts";
 import Modal from "./Modal";
@@ -24,17 +24,18 @@ const SpaceCard: React.FC<SpaceCardProps> = ({ space }) => {
             setRoomId(space.spaceid);
             navigate(`/space/${space.spaceid}`);
         }}>
-            <div
-                className="space_card_image"
-                style={{ backgroundImage: `url(${space.spaceimage})` }}
-            ></div>
+            <img
+                src={space.spaceimage.toString()}
+                className="space_card_image absolute w-full h-full rounded-lg"
+            ></img>
             <div className="space_card_title">
                 <span>{space.spacename}</span>
                 {
                     space.linked === false ? (
                         <>
-                            <EllipsisVertical stroke="#000" className="ellipsis icon hover" />
-                            <div className="space_card_options" onClick={(e) => e.stopPropagation()}>
+                            <EllipsisVertical stroke="black"
+                                className="ellipsis  icon hover z-100" fill="black" />
+                            <div className="space_card_options z-100" onClick={(e) => e.stopPropagation()}>
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();

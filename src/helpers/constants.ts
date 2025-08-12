@@ -1,3 +1,6 @@
+import { io } from "socket.io-client";
+import { SERVER_URL } from "../context/AppState";
+
 export const constants = {
     client: {
         joinSpace: "1.1",
@@ -49,3 +52,10 @@ export const constants = {
         room1: ".1"
     }
 }
+
+export const DEFAULT_MAP_ID = "a26e95bd-a94f-479b-af1b-4fbd51a169eb";
+
+
+export const socket = io(SERVER_URL, {
+    transports: ["websocket"],
+});

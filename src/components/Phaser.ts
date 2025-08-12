@@ -7,8 +7,7 @@ import pottedplants from "../map_assets/pottedplants.png";
 import office_pallete from "../map_assets/office_pallete.png";
 import { TileIndex, TilemapLayers } from "../types/PhaserTypes";
 import { eventBus } from "../helpers/EventBus";
-import { constants } from "../helpers/constants";
-import { socket } from "../context/SocketState";
+import { constants, socket } from "../helpers/constants";
 
 export class GameScene extends Phaser.Scene {
     private cursors: Phaser.Types.Input.Keyboard.CursorKeys | undefined;
@@ -19,14 +18,13 @@ export class GameScene extends Phaser.Scene {
     private otherPlayers: { [id: string]: { player: Phaser.Physics.Arcade.Sprite, name: Phaser.GameObjects.Text } } = {};
     private colliders: Phaser.GameObjects.Rectangle[] = [];
 
-    // event states
+
     private joinedStage: boolean = false;
     public userId: string = "";
     private velocity: { [key: string]: number } = {};
     private stop: boolean = true;
     private spaceId: string = "";
     private textStyle: Phaser.Types.GameObjects.Text.TextStyle = {};
-
 
     constructor() {
         super({ key: "GameScene" });
@@ -85,41 +83,37 @@ export class GameScene extends Phaser.Scene {
         if (this.cursors && this.player) {
             this.player.setVelocity(0);
 
+            let moved = false;
 
             if (this.cursors.left.isDown) {
                 this.movePlayer("left");
-                this.player.setVelocityX(-160);
+                this.player.setVelocityX(this.velocity["left"]);
                 this.player.anims.play("left", true);
                 this.stop = false;
-                console.log("position: ", this.player.x, this.player.y);
+                moved = true;
             } else if (this.cursors.right.isDown) {
                 this.movePlayer("right");
-                this.player.setVelocityX(160);
+                this.player.setVelocityX(this.velocity["right"]);
                 this.player.anims.play("right", true);
                 this.stop = false;
-                console.log("position: ", this.player.x, this.player.y);
+                moved = true;
             }
 
             if (this.cursors.up.isDown) {
                 this.movePlayer("up");
-                this.player.setVelocityY(-160);
+                this.player.setVelocityY(this.velocity["up"]);
                 this.player.anims.play("up", true);
                 this.stop = false;
-                console.log("position: ", this.player.x, this.player.y);
+                moved = true;
             } else if (this.cursors.down.isDown) {
                 this.movePlayer("down");
-                this.player.setVelocityY(160);
+                this.player.setVelocityY(this.velocity["down"]);
                 this.player.anims.play("down", true);
                 this.stop = false;
-                console.log("position: ", this.player.x, this.player.y);
+                moved = true;
             }
 
-            if (
-                !this.cursors.left.isDown &&
-                !this.cursors.right.isDown &&
-                !this.cursors.up.isDown &&
-                !this.cursors.down.isDown
-            ) {
+            if (!moved) {
                 if (!this.stop) {
                     this.movePlayer("stop");
                     this.stop = true;
@@ -127,6 +121,7 @@ export class GameScene extends Phaser.Scene {
                 this.player.setVelocity(0);
                 this.player.anims.pause();
             }
+
 
             this.player.getData("name")?.setPosition(this.player.x, this.player.y - 20);
         }
@@ -217,7 +212,7 @@ export class GameScene extends Phaser.Scene {
 
     private createInteractionHighlights() {
         if (this.layers) {
-            var highlight: Phaser.GameObjects.Rectangle | null;
+            let highlight: Phaser.GameObjects.Rectangle | null;
 
             this.physics.add.overlap(this.player, this.layers.interactive, () => {
                 const tile = this.layers.interactive.getTileAtWorldXY(
@@ -247,8 +242,8 @@ export class GameScene extends Phaser.Scene {
                     }
                 } else {
                     if (highlight) {
-                        highlight.destroy(); // Remove the rectangle
-                        highlight = null;    // Reset the reference
+                        highlight.destroy();
+                        highlight = null;
                         if (this.joinedStage)
                             eventBus.emit(constants.events.collidingLeave);
                     }
@@ -271,29 +266,44 @@ export class GameScene extends Phaser.Scene {
             this.input.keyboard!.enabled = true;
         });
 
-        eventBus.on(constants.server.playersLocation, (data: { [key: string]: { x: number, y: number, userId: string, userName: string } }[]) => {
-            console.log("other players ", data, this.userId, this.physics);
+
+        eventBus.on(constants.server.playersLocation, (data: { x: number, y: number, userId: string, userName: string }[]) => {
+
             data.forEach((user) => {
-                if (!this.otherPlayers[user.userId.toString()] && user.userId.toString() !== this.userId && Object(this.otherPlayers).length != 0) {
-                    this.otherPlayers[user.userId.toString()] = {
+                const uid = user.userId.toString();
+                if (uid === this.userId) return;
+                if (!this.otherPlayers[uid]) {
+                    this.otherPlayers[uid] = {
                         player: this.physics?.add?.sprite(Number(user.x), Number(user.y), "player", 0),
                         name: this.add.text(Number(user.x), Number(user.y) - 20, user.userName.toString(), this.textStyle).setOrigin(0.5, 1)
-                    }
+                    };
+
                     this.colliders.forEach((collider) => {
-                        this.physics.add.collider(this.otherPlayers[user.userId.toString()].player, collider);
+                        this.physics.add.collider(this.otherPlayers[uid].player, collider);
                     });
+                } else {
+
+                    this.otherPlayers[uid].player.setPosition(Number(user.x), Number(user.y));
+                    this.otherPlayers[uid].name.setPosition(Number(user.x), Number(user.y) - 20);
                 }
-            })
-        })
+            });
+        });
 
         socket.on(constants.server.userLeftSpace, (data: { userId: string }) => {
             console.log("User left space", data);
-            this.otherPlayers[data.userId].player.destroy();
-            this.otherPlayers[data.userId].name.destroy();
-            delete this.otherPlayers[data.userId];
+            const uid = data.userId;
+            if (this.otherPlayers[uid]) {
+                try {
+                    this.otherPlayers[uid].player.destroy();
+                    this.otherPlayers[uid].name.destroy();
+                } catch { /* ignore */ }
+                delete this.otherPlayers[uid];
+            }
         });
 
         socket.on(constants.server.userJoinedSpace, (data: { userId: string, spaceId: string, userName: string }) => {
+
+            if (data.userId === this.userId) return;
             if (!this.otherPlayers[data.userId]) {
                 this.otherPlayers[data.userId] = {
                     player: this.physics.add.sprite(400, 400, "player", 0),
@@ -303,25 +313,55 @@ export class GameScene extends Phaser.Scene {
                     this.physics.add.collider(this.otherPlayers[data.userId.toString()].player, collider);
                 });
             }
-            console.log("spaceId: ", this.spaceId);
+
             socket.emit(constants.client.location, { x: this.player.x, y: this.player.y, userId: this.userId, to: data.userId, spaceId: this.spaceId });
         });
 
-        socket.on(constants.server.userMoved, (data: { userId: string, key: string }) => {
-            if (this.otherPlayers[data.userId]) {
-                this.otherPlayers[data.userId].player.setVelocity(0);
-                console.log("moving player, ", data.key);
-                if (data.key === "left" || data.key === "right") {
-                    this.otherPlayers[data.userId].player.setVelocityX(this.velocity[data.key]);
-                    this.otherPlayers[data.userId].player.anims.play(data.key, true);
-                } else if (data.key === "up" || data.key === "down") {
-                    this.otherPlayers[data.userId].player.setVelocityY(this.velocity[data.key]);
-                    this.otherPlayers[data.userId].player.anims.play(data.key, true);
-                } else {
-                    this.otherPlayers[data.userId].player.setVelocity(0);
-                    this.otherPlayers[data.userId].player.anims.stop();
+
+        socket.on(constants.server.userMoved, (data: { userId: string, key: string, x?: number | string, y?: number | string }) => {
+            const uid = data.userId;
+            const sx = data.x !== undefined ? Number(data.x) : undefined;
+            const sy = data.y !== undefined ? Number(data.y) : undefined;
+
+
+            if (uid === this.userId) {
+                if (typeof sx === "number" && typeof sy === "number") {
+                    this.player.getData("name")?.setPosition(this.player.x, this.player.y - 20);
                 }
-                this.otherPlayers[data.userId].name.setPosition(this.otherPlayers[data.userId].player.x, this.otherPlayers[data.userId].player.y - 20)
+                return;
+            }
+
+
+            if (!this.otherPlayers[uid]) return;
+
+            const other = this.otherPlayers[uid];
+            if (typeof sx === "number" && typeof sy === "number") {
+                other.name.setPosition(other.player.x, other.player.y - 20);
+                other.player.setPosition(sx, sy);
+                if (data.key === "left" || data.key === "right") {
+
+                    other.player.anims.play(data.key, true);
+                } else if (data.key === "up" || data.key === "down") {
+
+                    other.player.anims.play(data.key, true);
+                } else {
+
+                    other.player.anims.stop();
+                }
+            } else {
+
+                other.player.setVelocity(0);
+                if (data.key === "left" || data.key === "right") {
+                    other.player.setVelocityX(this.velocity[data.key]);
+                    other.player.anims.play(data.key, true);
+                } else if (data.key === "up" || data.key === "down") {
+                    other.player.setVelocityY(this.velocity[data.key]);
+                    other.player.anims.play(data.key, true);
+                } else {
+                    other.player.setVelocity(0);
+                    other.player.anims.stop();
+                }
+                other.name.setPosition(other.player.x, other.player.y - 20);
             }
         })
 
@@ -336,6 +376,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     private movePlayer(key: string) {
+
         socket.emit(
             constants.client.move,
             {
